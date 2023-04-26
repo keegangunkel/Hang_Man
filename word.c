@@ -10,7 +10,8 @@
 
 struct ResponseData { char* data; size_t size; CURLcode code; };
 
-static size_t http_callback(char* ptr, size_t size, size_t nmemb, void* userdata) {
+/* Copied from https://curl.se/libcurl/c/CURLOPT_WRITEFUNCTION.html */
+size_t http_callback(char* ptr, size_t size, size_t nmemb, void* userdata) {
   size_t realsize = size * nmemb;
   struct ResponseData* data = (struct ResponseData*) userdata;
 
@@ -40,6 +41,7 @@ static size_t http_callback(char* ptr, size_t size, size_t nmemb, void* userdata
   return realsize;
 }
 
+/* data must be free'd */
 struct ResponseData httpGet(char* url) {
   CURL* curl;
   struct ResponseData result = { .data = NULL, .size = 0, .code = 0 };
@@ -66,4 +68,5 @@ int main() {
   char* word_endpoint = "https://random-word-api.herokuapp.com/word?number=1";
   struct ResponseData word_data = httpGet(word_endpoint);
   printf("result: %s\n", word_data.data);
+  free(word_data.data);
 }
