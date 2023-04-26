@@ -7,6 +7,7 @@
 // // curl.se/libcurl # man libcurl // sudo apt install libcurl4-doc
 #include <jansson.h> // sudo apt install libjansson-dev
 //https://github.com/akheron/jansson
+// https://jansson.readthedocs.io/en/2.1/apiref.html#json_t
 
 struct ResponseData { char* data; size_t size; CURLcode code; };
 
@@ -62,11 +63,27 @@ struct ResponseData httpGet(char* url) {
   curl_global_cleanup(); // do I need both cleanups?
   return result;
 }
+
+/* Return must be free'd using json_decref */
+/* copied from https://github.com/akheron/jansson/blob/master/examples/simple_parse.c */
+json_t* parse_json(const char* json_str) {
+  json_error_t error;
+  json_t* obj = json_loads(json_str, 0, &error);
+  if (!obj) {
+    fprintf(stderr, "Failed to parse JSON: %s\n", error.text);
+    return NULL;
+  }
+  return obj;
 }
 
 int main() {
   char* word_endpoint = "https://random-word-api.herokuapp.com/word?number=1";
   struct ResponseData word_data = httpGet(word_endpoint);
-  printf("result: %s\n", word_data.data);
+
+  json_t* json_obj = parse_json(word_data.data);
+  const char *word = json_string_value(json_array_get(json_obj, 0));
   free(word_data.data);
+
+  printf("result: %s\n", word);
+  json_decref(json_obj);
 }
