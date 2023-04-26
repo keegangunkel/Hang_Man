@@ -1,4 +1,8 @@
 # Hang Man
+<<<<<<< HEAD
+=======
+* Written in VIM
+>>>>>>> 6939d20e8acda57c08c98bebb1d9d82a5e004ca7
 * Application Development 1 Final Project at Dunwoody College of Technology
 * Contributors: Keegan Gunkel, Cooper Hanson, Anthony Steffl, George Shea, Namduk Tsering
 
