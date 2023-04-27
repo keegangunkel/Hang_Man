@@ -68,7 +68,7 @@ refreshing as the user guesses incorrectly.
     * Bomb -- remove one of the incorrect letters from the character bank
     * Hint -- described above
     * Skip -- Skip your turn in multiplayer
-    * Double Guess -- guess two characters, if either are correct the hangman will not be drawn
+    * Double Guess -- guess two characters, if either are correct the drawing will not be drawn
     * Wild card -- can be placed anywhere on the word, only replaced one occurence of the letter
 - [ ] Difficulties
 
