@@ -12,5 +12,16 @@ int main() {
   free(word_data.data);
 
   printf("result: %s\n", word);
-  json_decref(json_obj);
+  // Now let's get the definition
+  
+  char dict_endpoint[50];
+  sprintf(dict_endpoint, "https://api.dictionaryapi.dev/api/v2/entries/en/%s", word);
+  struct ResponseData dict_data = httpGet(dict_endpoint);
+  json_t* dict_obj = parse_json(dict_data.data);
+  json_t* definition = json_array_get(json_object_get(json_array_get(json_object_get(json_array_get(dict_obj, 0), "meanings"), 0), "definitions"), 0);
+  printf("The dict data says: %s\n", json_string_value(json_object_get(definition, "definition")));
+
+  free(dict_data.data);
+  json_decref(json_obj); // frees the word variable
+  json_decref(dict_obj);
 }
