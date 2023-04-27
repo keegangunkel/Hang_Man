@@ -2,8 +2,12 @@
 #include <jansson.h>
 #include "http.h"
 
-int main() {
-  printf("Random Word Generation example\n");
+typedef struct {
+  char* letters;
+  char* synonym;
+  char* antonym;
+} Word;
+
 /*
  * Gets a random word from the internet
  * Result must be free'd
@@ -23,20 +27,26 @@ char* getRandomWord() {
   return result;
 }
 
+/* This is not yet implemented */
+Word wordFromLetters(char* letters) {
+  Word result = { 0 };
 
-  printf("result: %s\n", word);
-  // Now let's get the definition
-  
   char dict_endpoint[50];
-  sprintf(dict_endpoint, "https://api.dictionaryapi.dev/api/v2/entries/en/%s", word);
+  sprintf(dict_endpoint, "https://api.dictionaryapi.dev/api/v2/entries/en/%s", letters);
   struct ResponseData dict_data = httpGet(dict_endpoint);
   json_t* dict_obj = parse_json(dict_data.data);
+  printf("");
+
+  return result;
+}
+  /*
   json_t* definition = json_array_get(json_object_get(json_array_get(json_object_get(json_array_get(dict_obj, 0), "meanings"), 0), "definitions"), 0);
   printf("The dict data says: %s\n", json_string_value(json_object_get(definition, "definition")));
 
   free(dict_data.data);
-  json_decref(json_obj); // frees the word variable
   json_decref(dict_obj);
+  */
+
 int main() {
   char* word = getRandomWord();
   printf("The random word was %s\n", word);
