@@ -32,7 +32,7 @@ refreshing as the user guesses incorrectly.
 * The program will select a random word and display the length with `_` underscores
 * The program will then wait for the user input, evaluate their input one character at a time
 * The program will replace the `_`'s with the input character where it occurs in the word
-* The program will give user set amount of time to complete word with less time given as difficulty increases  
+* The program will give the user set amount of time to complete word with less time given as difficulty increases  
 * If there character has no occurences in the word, a new part of the hangman will be drawn
 * The game ends when either the entire word is revealed or the hangman has been fully drawn
 * There is a bank to show which characters have already been guessed
