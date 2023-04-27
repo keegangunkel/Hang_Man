@@ -91,7 +91,5 @@ int main() {
   free(word);
 
   printWord(w);
-
   return 0;
-  
 }
