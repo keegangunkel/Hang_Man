@@ -29,19 +29,29 @@ int main(int argc, char* argv[]) {
     SDL_AudioDeviceID wrongDeviceId = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
 
     // Play guessing game with sound effects
-    int guess = 0;
+    char guess;
     while (1) {
-        printf("Guess a number: ");
-        scanf("%d", &guess);
+        printf("Guess (c or w): ");
+        guess = getchar();
 
-        if (guess == 42) {
-            // Play sound effect for guessing right
-            SDL_QueueAudio(rightDeviceId, rightBuffer, rightLength);
-            SDL_PauseAudioDevice(rightDeviceId, 0);
-        } else {
-            // Play sound effect for guessing wrong
-            SDL_QueueAudio(wrongDeviceId, wrongBuffer, wrongLength);
-            SDL_PauseAudioDevice(wrongDeviceId, 0);
+        switch (guess) {
+            case 'c':
+                // Play sound effect for guessing right
+                SDL_QueueAudio(rightDeviceId, rightBuffer, rightLength);
+                SDL_PauseAudioDevice(rightDeviceId, 0);
+                break;
+            case 'w':
+                // Play sound effect for guessing wrong
+                SDL_QueueAudio(wrongDeviceId, wrongBuffer, wrongLength);
+                SDL_PauseAudioDevice(wrongDeviceId, 0);
+                break;
+            default:
+                break;
+        }
+
+        // Clear input buffer
+        while (getchar() != '\n') {
+            // do nothing
         }
     }
 
