@@ -89,23 +89,20 @@ void printWord(Word w) {
 }
 
 /* Library functions found here https://wiki.libsdl.org/SDL2/CategoryAPI */
-void sound_example() {
+void playWavFile(char* path) {
   if (SDL_Init(SDL_INIT_AUDIO) < 0) {
-    printf("SDL_Init failed: %s\n", SDL_GetError());
+    fprintf(stderr, "SDL_Init failed: %s\n", SDL_GetError());
     return;
   }
-
   if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
-    printf("Mix_OpenAudio failed: %s\n", Mix_GetError());
+    fprintf(stderr, "Mix_OpenAudio failed: %s\n", Mix_GetError());
     return;
   }
-
-  Mix_Chunk* sound = Mix_LoadWAV("correct_sound.wav");
+  Mix_Chunk* sound = Mix_LoadWAV(path);
   if (!sound) {
-    printf("Mix_LoadWAV failed: %s\n", Mix_GetError());
+    fprintf(stderr, "Mix_LoadWAV failed: %s\n", Mix_GetError());
     return;
   }
-
   if (Mix_PlayChannel(-1, sound, 0) < 0) {
     printf("Mix_PlayChannel failed: %s\n", Mix_GetError());
     return;
@@ -116,7 +113,7 @@ void sound_example() {
   Mix_CloseAudio();
   SDL_Quit();
   return;
-}
+} //playSoundFile
 
 int main() {
   char* word = getRandomWord();
@@ -124,6 +121,6 @@ int main() {
   free(word);
 
   printWord(w);
-  sound_example();
+  playWavFile("sounds/correct_sound.wav");
   return 0;
 }
