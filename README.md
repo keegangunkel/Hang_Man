@@ -25,6 +25,7 @@ refreshing as the user guesses incorrectly.
 `sudo apt-get -y install git build-essential`
 ### Build
 * Clone the repository
+* Run `make install-deps`
 * Run `make`to automatically compile
 ##### Packages that will auto install
 * libcurl4-openssl-dev
