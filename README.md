@@ -21,8 +21,8 @@ refreshing as the user guesses incorrectly.
 * [Conclusion](#conclusion)
 
 ## Installation
-### Dependencys
-`sudo apt-get -y install git libcurl4-openssl-dev libjansson-dev buildessential`
+### Dependencies
+`sudo apt-get -y install git libcurl4-openssl-dev libjansson-dev build-essential libsdl2-dev libsdl2-mixer-dev`
 ### Build
 * Clone the repository
 * Run `make`to automatically compile
