@@ -7,5 +7,6 @@ int main() {
   free(word);
 
   printWord(w);
+  freeWord(w);
   return 0;
 }

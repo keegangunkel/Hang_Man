@@ -14,6 +14,13 @@ void printWord(Word w) {
   return;
 }
 
+void freeWord(Word w) {
+  free(w.letters);
+  free(w.synonym);
+  free(w.antonym);
+  free(w.definition);
+}
+
 /*
  * Copies string from one pointer to another
  * @param dest - the destination to copy to. To malloc this needs to be a pointer to a pointer.
