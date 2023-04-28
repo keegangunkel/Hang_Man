@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <jansson.h>
 #include <SDL2/SDL.h> // sudo apt install libsdl2-dev
-#include <SDL2/SDL_audio.h> // included with ^
-#include <SDL2/SDL_mixer.h> // sudo apt install libsdl2-mixer-dev
+// #include <SDL2/SDL_audio.h> // included with ^ // do we need this?
+// #include <SDL2/SDL_mixer.h> // sudo apt install libsdl2-mixer-dev // do we need this?
 #include "http.h"
 
 typedef struct {
@@ -88,32 +88,6 @@ void printWord(Word w) {
   return;
 }
 
-/* Library functions found here https://wiki.libsdl.org/SDL2/CategoryAPI */
-void playWavFile(char* path) {
-  if (SDL_Init(SDL_INIT_AUDIO) < 0) {
-    fprintf(stderr, "SDL_Init failed: %s\n", SDL_GetError());
-    return;
-  }
-  if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
-    fprintf(stderr, "Mix_OpenAudio failed: %s\n", Mix_GetError());
-    return;
-  }
-  Mix_Chunk* sound = Mix_LoadWAV(path);
-  if (!sound) {
-    fprintf(stderr, "Mix_LoadWAV failed: %s\n", Mix_GetError());
-    return;
-  }
-  if (Mix_PlayChannel(-1, sound, 0) < 0) {
-    printf("Mix_PlayChannel failed: %s\n", Mix_GetError());
-    return;
-  }
-
-  while (Mix_Playing(-1)) { SDL_Delay(100); } // do we need this?
-  Mix_FreeChunk(sound);
-  Mix_CloseAudio();
-  SDL_Quit();
-  return;
-} //playSoundFile
 
 int main() {
   char* word = getRandomWord();
@@ -121,6 +95,5 @@ int main() {
   free(word);
 
   printWord(w);
-  playWavFile("sounds/correct_sound.wav");
   return 0;
 }
