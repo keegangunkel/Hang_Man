@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <jansson.h>
+#include <SDL2/SDL.h> // sudo apt install libsdl2-dev
+#include <SDL2/SDL_mixer.h> // sudo apt install libsdl2-mixer-dev
 #include "http.h"
 
 typedef struct {
