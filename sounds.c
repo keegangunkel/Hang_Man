@@ -10,7 +10,7 @@ int main(int argc, char* argv[]) {
     Uint32 bgmLength;
 
     // Load background music into memory
-    SDL_LoadWAV("background_music.wav", &wavSpec, &bgmBuffer, &bgmLength);
+    SDL_LoadWAV("sounds/background_music.wav", &wavSpec, &bgmBuffer, &bgmLength);
     SDL_AudioDeviceID bgmDeviceId = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
 
     // Queue and unpause the background music
@@ -20,12 +20,12 @@ int main(int argc, char* argv[]) {
     // Load sound effects for guessing right and wrong into memory
     Uint8* rightBuffer;
     Uint32 rightLength;
-    SDL_LoadWAV("correct_sound.wav", &wavSpec, &rightBuffer, &rightLength);
+    SDL_LoadWAV("sounds/correct_sound.wav", &wavSpec, &rightBuffer, &rightLength);
     SDL_AudioDeviceID rightDeviceId = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
 
     Uint8* wrongBuffer;
     Uint32 wrongLength;
-    SDL_LoadWAV("wrong_sound.wav", &wavSpec, &wrongBuffer, &wrongLength);
+    SDL_LoadWAV("sounds/wrong_sound.wav", &wavSpec, &wrongBuffer, &wrongLength);
     SDL_AudioDeviceID wrongDeviceId = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
 
     // Play guessing game with sound effects
@@ -46,6 +46,7 @@ int main(int argc, char* argv[]) {
                 SDL_PauseAudioDevice(wrongDeviceId, 0);
                 break;
             default:
+                return 0;
                 break;
         }
 
