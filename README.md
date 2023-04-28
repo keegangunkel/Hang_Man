@@ -22,10 +22,15 @@ refreshing as the user guesses incorrectly.
 
 ## Installation
 ### Dependencies
-`sudo apt-get -y install git libcurl4-openssl-dev libjansson-dev build-essential libsdl2-dev libsdl2-mixer-dev`
+`sudo apt-get -y install git build-essential`
 ### Build
 * Clone the repository
 * Run `make`to automatically compile
+##### Packages that will auto install
+* libcurl4-openssl-dev
+* libjansson-dev
+* libsdl2-dev
+* libsdl2-mixer-dev
 
 ## How to Play
 * Run the `./main` file within the repository to play the game in a terminal
