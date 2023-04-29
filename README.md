@@ -23,10 +23,12 @@ refreshing as the user guesses incorrectly.
 ## Installation
 ### Linux (recommended)
 #### Dependencies
-`sudo apt-get -y install git libcurl4-openssl-dev libjansson-dev buildessential`
+`sudo apt-get -y install git build-essential`
 #### Build
 * Clone the repository
+* Run `make install-deps`
 * Run `make`to automatically compile
+* Open the game with `./main`
 ### Windows
 Due to the complexities of installing compilers, libraries, and configuring build paths on windows, it's recommended to install [MS Visual Studio](https://visualstudio.microsoft.com/). A tutorial on getting the libraries setup can be found [here](https://youtu.be/tmGBhM8AEj8). You will need:
 * [SDL2](https://github.com/libsdl-org/SDL/releases/tag/release-2.26.5)
