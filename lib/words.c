@@ -1,6 +1,7 @@
 #include <jansson.h>
+#include <string.h>
 #include "http.h"
-
+///
 typedef struct {
   char* letters;
   char* synonym;
@@ -41,7 +42,7 @@ void charPtrCpy(char** dest, const char* src) {
  * Gets a random word from the internet
  * Result must be free'd
 */
-char* getRandomWord() {
+char* getRandomWordStr() {
   char* word_endpoint = "https://random-word-api.herokuapp.com/word?number=1";
   struct ResponseData word_data = httpGet(word_endpoint);
   json_t* json_obj = parse_json(word_data.data);
@@ -56,7 +57,23 @@ char* getRandomWord() {
   return result;
 }
 
-Word wordFromLetters(char* letters) {
+/*
+ * Gets a bunch of words from the API
+ * Result must be freed with json_decref
+ * @param int - The amount of words you want to return
+ * @return json_decref
+*/
+json_t* getRandomWordStrs(int count) {
+  char word_endpoint[100];
+  sprintf(word_endpoint, "https://random-word-api.herokuapp.com/word?number=%d", count);
+  struct ResponseData dict_data = httpGet(word_endpoint);
+  json_t* result = parse_json(dict_data.data);
+  free(dict_data.data);
+  return result;
+}
+
+/* Must be freed with freeWord() */
+Word wordFromLetters(const char* letters) {
   Word result = { 0 };
   char dict_endpoint[100];
   sprintf(dict_endpoint, "https://api.dictionaryapi.dev/api/v2/entries/en/%s", letters);
@@ -90,4 +107,33 @@ Word wordFromLetters(char* letters) {
 
   json_decref(dict_obj);
   return result;
+}
+
+/* Does this word meet the requirements? */
+int meetsHangmanRequirements(Word w) {
+  if (w.letters == NULL) { return 0; }
+  if (w.synonym == NULL) { return 0; }
+  if (w.antonym == NULL) { return 0; }
+  if (w.definition == NULL) { return 0; }
+  return 1;
+}
+
+/* The only function called from main */
+Word getHangmanWord() {
+  Word result = { 0 };
+  const int word_count = 50;
+  while (1) {
+    json_t* json_words = getRandomWordStrs(word_count);
+
+    for (int i=0; i<word_count; i++) {
+      const char* letters = json_string_value(json_array_get(json_words, i));
+      Word w = wordFromLetters(letters);
+
+      if (meetsHangmanRequirements(w)) { json_decref(json_words); printf("The chosen word was %d\n", i); return w; }
+      fprintf(stderr, "DEBUG: %s did not meet requirements\n", w.letters);
+      freeWord(w);
+    } //for//////
+    json_decref(json_words);
+  } //while
+  return result; 
 }

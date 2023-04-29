@@ -9,7 +9,7 @@
 //https://github.com/akheron/jansson
 // https://jansson.readthedocs.io/en/2.1/apiref.html#json_t
 
-struct ResponseData { char* data; size_t size; CURLcode code; };
+#include "http.h"
 
 /* Copied from https://curl.se/libcurl/c/CURLOPT_WRITEFUNCTION.html */
 size_t http_callback(char* ptr, size_t size, size_t nmemb, void* userdata) {

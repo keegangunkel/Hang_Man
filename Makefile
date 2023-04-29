@@ -1,8 +1,8 @@
 CC=gcc
 CFLAGS=-g -Wall -Wextra -Wpedantic
 LDFLAGS=-lm -lcurl -ljansson -lSDL2 -lSDL2_mixer
-DEPS = http.h
-OBJ = main.c
+DEPS=
+OBJ = lib/main.c lib/http.c lib/words.c
 
 %.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
