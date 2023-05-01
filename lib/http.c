@@ -105,16 +105,8 @@ json_t* parse_json(const char* json_str) {
 }
 
 /*
- * EXAMPLE USAGE
-int main() {
-  char* word_endpoint = "https://random-word-api.herokuapp.com/word?number=1";
-  ResponseData word_data = httpGet(word_endpoint);
-
-  json_t* json_obj = parse_json(word_data.data);
-  const char *word = json_string_value(json_array_get(json_obj, 0)); // copied from https://stackoverflow.com/questions/47226401/how-to-extract-keyless-values-from-json-array-using-jansson
-  free(word_data.data);
-
-  printf("result: %s\n", word);
-  json_decref(json_obj);
-}
+Example Usage
+RequestData* req = httpInitRequest("google.com");
+httpGet(req);
+freeRequest(req);
 */

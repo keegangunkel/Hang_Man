@@ -1,7 +1,7 @@
 #include <jansson.h>
 #include <string.h>
 #include "http.h"
-///
+
 typedef struct {
   char* letters;
   char* synonym;
@@ -43,16 +43,16 @@ void charPtrCpy(char** dest, const char* src) {
  * Result must be free'd
 */
 char* getRandomWordStr() {
-  char* word_endpoint = "https://random-word-api.herokuapp.com/word?number=1";
-  ResponseData word_data = httpGet(word_endpoint);
-  json_t* json_obj = parse_json(word_data.data);
+  RequestData* request = httpInitRequest("https://random-word-api.herokuapp.com/word?number=1");
+  httpGet(request);
+  json_t* json_obj = parse_json(request->response->data);
 
   // copied from https://stackoverflow.com/questions/47226401/how-to-extract-keyless-values-from-json-array-using-jansson
   const char *word = json_string_value(json_array_get(json_obj, 0)); 
   char* result = malloc(strlen(word) + 1);
   strcpy(result, word);
 
-  free(word_data.data);
+  freeRequest(request);
   json_decref(json_obj);
   return result;
 }
@@ -63,6 +63,8 @@ char* getRandomWordStr() {
  * @param int - The amount of words you want to return
  * @return json_decref
 */
+/*
+ * THIS IS BROKEN !!!!
 json_t* getRandomWordStrs(int count) {
   char word_endpoint[100];
   sprintf(word_endpoint, "https://random-word-api.herokuapp.com/word?number=%d", count);
@@ -71,6 +73,7 @@ json_t* getRandomWordStrs(int count) {
   free(dict_data.data);
   return result;
 }
+*/
 
 /* Must be freed with freeWord() */
 Word wordFromLetters(const char* letters) {
@@ -78,9 +81,10 @@ Word wordFromLetters(const char* letters) {
   char dict_endpoint[100];
   sprintf(dict_endpoint, "https://api.dictionaryapi.dev/api/v2/entries/en/%s", letters);
 
-  ResponseData dict_data = httpGet(dict_endpoint);
-  json_t* dict_obj = parse_json(dict_data.data);
-  free(dict_data.data);
+  RequestData* request = httpInitRequest(dict_endpoint);
+  httpGet(request);
+  json_t* dict_obj = parse_json(request->response->data);
+  freeRequest(request);
   const char* err = json_string_value(json_object_get(dict_obj, "title"));
   if (err != NULL) {
     // return early if error present
@@ -119,6 +123,7 @@ int meetsHangmanRequirements(Word w) {
 }
 
 /* The only function called from main */
+/* NOT WORKING
 Word getHangmanWord() {
   Word result = { 0 };
   const int word_count = 50;
@@ -137,3 +142,4 @@ Word getHangmanWord() {
   } //while
   return result; 
 }
+*/
