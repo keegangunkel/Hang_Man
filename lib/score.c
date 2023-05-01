@@ -17,6 +17,17 @@ int check()
     int correct = 0;
     int wordComplete = 0;
 
+    // will turn of or on on right answers
+    char boolWord[wordLen];
+    char constructWord[wordLen];
+    for (int i = 0; i < wordLen - 1; i++)
+    {
+        boolWord[i] = '0';
+        constructWord[i] = '0';
+    }
+    
+    // 
+
     // to be implemented
     int correctCount = 0;
 
@@ -52,13 +63,14 @@ int check()
                     int duplicateGuess = strchr(correctGuesses, guess[guessinx]) != NULL;
                     if (duplicateGuess == 0)
                     {
+                        boolWord[guessinx] = '1';
                         correctGuesses[guessinx] = guess[guessinx];
 
                         correctCount = correctCount + 1;
                         // implment score later
                         points = bonus * scoreMultiplyer;
 
-                        printf("Your smart %d", correctCount);
+                        printf("Your smart %d    %s", correctCount, boolWord);
                         printf("\n");
                     }
                 }
@@ -85,7 +97,7 @@ int check()
         printf("GameOver");
         printf("\n");
     }
-    if (correctCount == wordLen)
+    if (constructWord == boolWord)
     {
         printf("You completed word %d ", points);
         printf("\n");
