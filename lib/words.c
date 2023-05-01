@@ -63,17 +63,15 @@ char* getRandomWordStr() {
  * @param int - The amount of words you want to return
  * @return json_decref
 */
-/*
- * THIS IS BROKEN !!!!
 json_t* getRandomWordStrs(int count) {
   char word_endpoint[100];
   sprintf(word_endpoint, "https://random-word-api.herokuapp.com/word?number=%d", count);
-  ResponseData dict_data = httpGet(word_endpoint);
-  json_t* result = parse_json(dict_data.data);
-  free(dict_data.data);
+  RequestData* request = httpInitRequest(word_endpoint);
+  httpGet(request);
+  json_t* result = parse_json(request->response->data);
+  freeRequest(request);
   return result;
 }
-*/
 
 /* Must be freed with freeWord() */
 Word wordFromLetters(const char* letters) {
@@ -123,7 +121,6 @@ int meetsHangmanRequirements(Word w) {
 }
 
 /* The only function called from main */
-/* NOT WORKING
 Word getHangmanWord() {
   Word result = { 0 };
   const int word_count = 50;
@@ -137,9 +134,8 @@ Word getHangmanWord() {
       if (meetsHangmanRequirements(w)) { json_decref(json_words); printf("The chosen word was %d\n", i); return w; }
       fprintf(stderr, "DEBUG: %s did not meet requirements\n", w.letters);
       freeWord(w);
-    } //for//////
+    } //for
     json_decref(json_words);
   } //while
   return result; 
 }
-*/
