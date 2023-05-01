@@ -14,7 +14,7 @@
 /* Copied from https://curl.se/libcurl/c/CURLOPT_WRITEFUNCTION.html */
 size_t http_callback(char* ptr, size_t size, size_t nmemb, void* userdata) {
   size_t realsize = size * nmemb;
-  struct ResponseData* data = (struct ResponseData*) userdata;
+  ResponseData* data = (ResponseData*) userdata;
 
   // allocate memory
   if (!data->data) {
@@ -43,9 +43,9 @@ size_t http_callback(char* ptr, size_t size, size_t nmemb, void* userdata) {
 }
 
 /* data must be free'd */
-struct ResponseData httpGet(char* url) {
+ResponseData httpGet(char* url) {
   CURL* curl;
-  struct ResponseData result = { .data = NULL, .size = 0, .code = 0 };
+  ResponseData result = { .data = NULL, .size = 0, .code = 0 };
 
   curl_global_init(CURL_GLOBAL_ALL);
   curl = curl_easy_init();
@@ -80,7 +80,7 @@ json_t* parse_json(const char* json_str) {
  * EXAMPLE USAGE
 int main() {
   char* word_endpoint = "https://random-word-api.herokuapp.com/word?number=1";
-  struct ResponseData word_data = httpGet(word_endpoint);
+  ResponseData word_data = httpGet(word_endpoint);
 
   json_t* json_obj = parse_json(word_data.data);
   const char *word = json_string_value(json_array_get(json_obj, 0)); // copied from https://stackoverflow.com/questions/47226401/how-to-extract-keyless-values-from-json-array-using-jansson
