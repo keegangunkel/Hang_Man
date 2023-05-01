@@ -44,24 +44,24 @@ size_t http_callback(char* ptr, size_t size, size_t nmemb, void* userdata) {
 
 /* data must be free'd */
 ResponseData httpGet(char* url) {
-  CURL* curl;
-  ResponseData result = { .data = NULL, .size = 0, .code = 0 };
-
   curl_global_init(CURL_GLOBAL_ALL);
-  curl = curl_easy_init();
-  if (!curl) { fprintf(stderr, "Failed to initialize curl\n"); return result; }
+  RequestData request = { .url = url, .curl = curl_easy_init(), .response = NULL };
+  ResponseData response = { .data = NULL, .size = 0, .code = 0 };
+  request.response = &response;
 
-  curl_easy_setopt(curl, CURLOPT_URL, url);
-  curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, stderr);
-  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, http_callback);
-  curl_easy_setopt(curl, CURLOPT_WRITEDATA, &result);
-  result.code = curl_easy_perform(curl);
-  if (result.code != CURLE_OK)
-    { fprintf(stderr, "Failed CURL request: %s\n", curl_easy_strerror(result.code)); }
+  if (!request.curl) { fprintf(stderr, "Failed to initialize curl\n"); return response; }
 
-  curl_easy_cleanup(curl);
+  curl_easy_setopt(request.curl, CURLOPT_URL, request.url);
+  curl_easy_setopt(request.curl, CURLOPT_ERRORBUFFER, stderr);
+  curl_easy_setopt(request.curl, CURLOPT_WRITEFUNCTION, http_callback);
+  curl_easy_setopt(request.curl, CURLOPT_WRITEDATA, request.response);
+  request.response->code = curl_easy_perform(request.curl);
+  if (request.response->code != CURLE_OK)
+    { fprintf(stderr, "Failed CURL request: %s\n", curl_easy_strerror(request.response->code)); }
+
+  curl_easy_cleanup(request.curl);
   curl_global_cleanup(); // do I need both cleanups?
-  return result;
+  return response;
 }
 
 /* Return must be free'd using json_decref */
