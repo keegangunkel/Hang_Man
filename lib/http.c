@@ -2,13 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <curl/curl.h> // sudo apt install libcurl4-openssl-dev
-// https://youtu.be/x2PaEz1URso
-// // curl.se/libcurl # man libcurl // sudo apt install libcurl4-doc
-#include <jansson.h> // sudo apt install libjansson-dev
-//https://github.com/akheron/jansson
-// https://jansson.readthedocs.io/en/2.1/apiref.html#json_t
-
 #include "http.h"
 
 /* Copied from https://curl.se/libcurl/c/CURLOPT_WRITEFUNCTION.html */
@@ -42,18 +35,6 @@ size_t http_callback(char* ptr, size_t size, size_t nmemb, void* userdata) {
   return realsize;
 }
 
-void freeRequest(RequestData* req) {
-  if (!req) { return; }
-  ResponseData* resp = req->response;
-  if (resp) {
-    if (resp->data) { free(resp->data); }
-    free(resp);
-  }
-  if(req->curl)
-    { curl_easy_cleanup(req->curl); }
-  free(req);
-  return;
-}
 
 /* Result must be free'd with freeRequest() */
 RequestData* httpInitRequest(char* url) {
@@ -89,6 +70,19 @@ void httpGet(RequestData* request) {
   request->response->code = curl_easy_perform(request->curl);
   if (request->response->code != CURLE_OK)
     { fprintf(stderr, "Failed CURL request: %s\n", curl_easy_strerror(request->response->code)); }
+  return;
+}
+
+void freeRequest(RequestData* req) {
+  if (!req) { return; }
+  ResponseData* resp = req->response;
+  if (resp) {
+    if (resp->data) { free(resp->data); }
+    free(resp);
+  }
+  if(req->curl)
+    { curl_easy_cleanup(req->curl); }
+  free(req);
   return;
 }
 
