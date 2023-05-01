@@ -4,7 +4,8 @@
 int check() 
 {
     Word word = getHangmanWord();
-    printf("%s", word.letters);
+    printf("raaaaaaaaaaaaaaaaa   %s", word.letters);
+    freeWord(word);
 
     return 0;
 }
