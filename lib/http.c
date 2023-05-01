@@ -55,7 +55,7 @@ void freeRequest(RequestData* req) {
   return;
 }
 
-/* Result must be free'd */
+/* Result must be free'd with freeRequest() */
 RequestData* httpInitRequest(char* url) {
   curl_global_init(CURL_GLOBAL_ALL); // do I need to call this every time?
   RequestData req = { .url = url, .curl = curl_easy_init(), .response = NULL };
@@ -64,15 +64,16 @@ RequestData* httpInitRequest(char* url) {
   // Allocate Request
   RequestData* request = malloc(sizeof(RequestData));
   if (!request) { fprintf(stderr, "Unable to allocate memory for HTTP request\n"); return NULL; }
-  memcpy(request, &req, sizeof(RequestData));
   
   // Allocate Response
   ResponseData* response = malloc(sizeof(ResponseData));
+  req.response = response;
   if (!response) {
     fprintf(stderr, "Unable to allocate memory for HTTP response\n");
     free(request);
     return NULL;
   }
+  memcpy(request, &req, sizeof(RequestData));
   memcpy(response, &resp, sizeof(ResponseData));
 
   curl_easy_setopt(request->curl, CURLOPT_URL, request->url);
@@ -82,25 +83,13 @@ RequestData* httpInitRequest(char* url) {
 
   return request;
 }
-/* data must be free'd */
-ResponseData httpGet(char* url) {
-  RequestData request = { .url = url, .curl = curl_easy_init(), .response = NULL };
-  ResponseData response = { .data = NULL, .size = 0, .code = 0 };
-  request.response = &response;
 
-  if (!request.curl) { fprintf(stderr, "Failed to initialize curl\n"); return response; }
-
-  curl_easy_setopt(request.curl, CURLOPT_URL, request.url);
-  curl_easy_setopt(request.curl, CURLOPT_ERRORBUFFER, stderr);
-  curl_easy_setopt(request.curl, CURLOPT_WRITEFUNCTION, http_callback);
-  curl_easy_setopt(request.curl, CURLOPT_WRITEDATA, request.response);
-  request.response->code = curl_easy_perform(request.curl);
-  if (request.response->code != CURLE_OK)
-    { fprintf(stderr, "Failed CURL request: %s\n", curl_easy_strerror(request.response->code)); }
-
-  curl_easy_cleanup(request.curl);
-  curl_global_cleanup(); // do I need both cleanups?
-  return response;
+// Fills the response of the request
+void httpGet(RequestData* request) {
+  request->response->code = curl_easy_perform(request->curl);
+  if (request->response->code != CURLE_OK)
+    { fprintf(stderr, "Failed CURL request: %s\n", curl_easy_strerror(request->response->code)); }
+  return;
 }
 
 /* Return must be free'd using json_decref */
