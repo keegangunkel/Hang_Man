@@ -44,7 +44,7 @@ void charPtrCpy(char** dest, const char* src) {
 */
 char* getRandomWordStr() {
   char* word_endpoint = "https://random-word-api.herokuapp.com/word?number=1";
-  struct ResponseData word_data = httpGet(word_endpoint);
+  ResponseData word_data = httpGet(word_endpoint);
   json_t* json_obj = parse_json(word_data.data);
 
   // copied from https://stackoverflow.com/questions/47226401/how-to-extract-keyless-values-from-json-array-using-jansson
@@ -66,7 +66,7 @@ char* getRandomWordStr() {
 json_t* getRandomWordStrs(int count) {
   char word_endpoint[100];
   sprintf(word_endpoint, "https://random-word-api.herokuapp.com/word?number=%d", count);
-  struct ResponseData dict_data = httpGet(word_endpoint);
+  ResponseData dict_data = httpGet(word_endpoint);
   json_t* result = parse_json(dict_data.data);
   free(dict_data.data);
   return result;
@@ -78,7 +78,7 @@ Word wordFromLetters(const char* letters) {
   char dict_endpoint[100];
   sprintf(dict_endpoint, "https://api.dictionaryapi.dev/api/v2/entries/en/%s", letters);
 
-  struct ResponseData dict_data = httpGet(dict_endpoint);
+  ResponseData dict_data = httpGet(dict_endpoint);
   json_t* dict_obj = parse_json(dict_data.data);
   free(dict_data.data);
   const char* err = json_string_value(json_object_get(dict_obj, "title"));
