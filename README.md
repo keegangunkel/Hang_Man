@@ -21,11 +21,19 @@ refreshing as the user guesses incorrectly.
 * [Conclusion](#conclusion)
 
 ## Installation
-### Dependencys
-`sudo apt-get -y install git libcurl4-openssl-dev libjansson-dev buildessential`
-### Build
+### Linux (recommended)
+#### Dependencies
+`sudo apt-get -y install git build-essential`
+#### Build
 * Clone the repository
+* Run `make install-deps`
 * Run `make`to automatically compile
+* Open the game with `./main`
+### Windows
+Due to the complexities of installing compilers, libraries, and configuring build paths on windows, it's recommended to install [MS Visual Studio](https://visualstudio.microsoft.com/). A tutorial on getting the libraries setup can be found [here](https://youtu.be/tmGBhM8AEj8). You will need:
+* [SDL2](https://github.com/libsdl-org/SDL/releases/tag/release-2.26.5)
+* [jansson](https://digip.org/jansson/releases/)
+* [curl](https://curl.se/windows/)
 
 ## How to Play
 * Run the `./main` file within the repository to play the game in a terminal
