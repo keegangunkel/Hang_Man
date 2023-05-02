@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include "words.h"
+#include "score.h"
+
 
 int main() {
-  Word w = getHangmanWord();
-  printWord(w);
-  freeWord(w);
+  check();
   return 0;
 }
