@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "http.h"
 
@@ -83,6 +84,21 @@ void freeRequest(RequestData* req) {
   if(req->curl)
     { curl_easy_cleanup(req->curl); }
   free(req);
+  return;
+}
+
+void httpMultiGet(RequestData** requests, int count) {
+  CURLM* multi = curl_multi_init();
+  for (int i=0; i<count; i++) {
+    curl_multi_add_handle(multi, requests[i]->curl);
+  }
+
+  int running = count;
+  while (running) {
+    // TODO: Check if this returned successfully
+    /* CURLMcode code = */ curl_multi_perform(multi, &running);
+  }
+  curl_multi_cleanup(multi);
   return;
 }
 

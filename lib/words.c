@@ -74,6 +74,33 @@ json_t* getRandomWordStrs(int count) {
 }
 
 /* Must be freed with freeWord() */
+Word wordFromJson(json_t* json) {
+  Word result = { 0 };
+  const char* err = json_string_value(json_object_get(json, "title"));
+  if (err != NULL)
+    { return result; }
+
+  json_t* word_json = json_array_get(
+    json_object_get(
+      json_array_get(
+        json, 0),
+      "meanings"),
+    0);
+
+  const char* letters = json_string_value(json_object_get(json_array_get(json, 0), "word"));
+  const char* syn_str = json_string_value(json_array_get(json_object_get(word_json, "synonyms"), 0));
+  const char* ant_str = json_string_value(json_array_get(json_object_get(word_json, "antonyms"), 0));
+  const char* def_str = json_string_value(json_object_get(json_array_get(json_object_get(word_json, "definitions"), 0), "definition"));
+
+  charPtrCpy(&result.letters,    letters);
+  charPtrCpy(&result.synonym,    syn_str);
+  charPtrCpy(&result.antonym,    ant_str);
+  charPtrCpy(&result.definition, def_str);
+
+  return result;
+}
+
+/* Must be freed with freeWord() */
 Word wordFromLetters(const char* letters) {
   Word result = { 0 };
   char dict_endpoint[100];
@@ -120,22 +147,45 @@ int meetsHangmanRequirements(Word w) {
   return 1;
 }
 
-/* The only function called from main */
+/*
+ * The only function to be called from main
+ * result must be free'd with freeWord
+*/
 Word getHangmanWord() {
   Word result = { 0 };
   const int word_count = 50;
-  while (1) {
-    json_t* json_words = getRandomWordStrs(word_count);
+  // Get a list of word strings
+  json_t* json_words = getRandomWordStrs(word_count);
 
-    for (int i=0; i<word_count; i++) {
-      const char* letters = json_string_value(json_array_get(json_words, i));
-      Word w = wordFromLetters(letters);
+  // Setup the dictionary requests
+  RequestData* requests[word_count];
+  for (int i=0; i<word_count; i++) {
+    char endpoint[100];
+    const char* letters = json_string_value(json_array_get(json_words, i));
+    sprintf(endpoint, "https://api.dictionaryapi.dev/api/v2/entries/en/%s", letters);
+    requests[i] = httpInitRequest(endpoint);
+  }
 
-      if (meetsHangmanRequirements(w)) { json_decref(json_words); printf("The chosen word was %d\n", i); return w; }
-      fprintf(stderr, "DEBUG: %s did not meet requirements\n", w.letters);
-      freeWord(w);
-    } //for
-    json_decref(json_words);
-  } //while
-  return result; 
+  // Perform the requests
+  httpMultiGet(requests, word_count);
+
+  // Pick a word out of those requests
+  int word_ndx = 0;
+  for (word_ndx=0; word_ndx<word_count; word_ndx++) {
+    json_t* json = parse_json(requests[word_ndx]->response->data);
+    result = wordFromJson(json);
+    json_decref(json);
+
+    if (meetsHangmanRequirements(result)) { break; }
+    freeWord(result);
+    freeRequest(requests[word_ndx]);
+  }
+
+  // Free the rest of the unused requests
+  int fre = word_ndx + 1;
+  for (int i=fre; i<word_count; i++)
+    { freeRequest(requests[i]); }
+
+  if (word_ndx == word_count) { return getHangmanWord(); }
+  return result;
 }

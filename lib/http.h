@@ -12,6 +12,7 @@ size_t http_callback(char* ptr, size_t size, size_t nmemb, void* userdata);
 RequestData* httpInitRequest(char* url);
 void httpGet(RequestData* request);
 void freeRequest(RequestData* req);
+void httpMultiGet(RequestData** requests, int count);
 
 json_t* parse_json(const char* json_str);
 
