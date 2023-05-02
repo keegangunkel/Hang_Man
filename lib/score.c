@@ -6,18 +6,16 @@ int check()
 {
     Word word = getHangmanWord();
     int wordLen = strlen(word.letters);
-    printf("raaaaaaabbbbaaaaaa   %s, %d", word.letters, wordLen);
-    printf("\n");
+    printf("DEBUG: %s (%d)\n", word.letters, wordLen);
 
     char guess[26];
-
     char wrongGuesses[26];
     char correctGuesses[26];
     // bools
     int correct = 0;
     int wordComplete = 0;
 
-    // will turn of or on on right answers
+    // will turn off or on on right answers
     char boolWord[wordLen];
     char constructWord[wordLen];
     for (int i = 0; i < wordLen - 1; i++)
@@ -37,10 +35,10 @@ int check()
     float scoreMultiplyer = 1;
     int bonus = 1;
 
-    if (wordComplete == 0)
+    if (!wordComplete)
     {
         // lives loop keep playing until either you win or run out of lives
-        while (0 < lives)
+        while (lives)
         {
             printf("Enter word: ");
             scanf("%26s", guess);
@@ -70,8 +68,7 @@ int check()
                         // implment score later
                         points = bonus * scoreMultiplyer;
 
-                        printf("Your smart %d    %s", correctCount, boolWord);
-                        printf("\n");
+                        printf("Your smart %d    %s\n", correctCount, boolWord);
                     }
                 }
                 else
@@ -80,11 +77,10 @@ int check()
                     int duplicateGuess = strchr(wrongGuesses, guess[guessinx]) != NULL;
                     if (duplicateGuess == 0)
                     {
-                        printf("You guessed wrong ");
+                        printf("You guessed wrong\n");
                         wrongGuesses[guessinx] = guess[guessinx];
-                        printf("\n");
                         lives = lives - 1;
-                        printf(" %d \n", lives);
+                        printf(" %d attempts remain \n", lives);
                     }
                 }
 
@@ -92,19 +88,14 @@ int check()
             }
         }
     }
-    if (lives <= 0)
-    {
-        printf("GameOver");
-        printf("\n");
-    }
+    if (!lives)
+      { printf("Game Over\n"); }
     if (constructWord == boolWord)
     {
-        printf("You completed word %d ", points);
-        printf("\n");
-        lives = -1;
+        printf("You completed word (%d pts)\n", points);
+        lives = 0;
     }
 
-    printf("\n");
     printf("_________________________\n");
     freeWord(word);
 
