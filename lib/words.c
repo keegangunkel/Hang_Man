@@ -177,7 +177,7 @@ Word getHangmanWord() {
   for (word_ndx=0; word_ndx<word_count; word_ndx++) {
     json_t* json = parse_json(requests[word_ndx]->response->data);
     if (!json) {
-      fprintf(stderr, "You're probably being rate limited\n");
+      fprintf(stderr, "You're probably being rate limited, shutting down\n");
       longjmp(buffer, 1);
     }
 
