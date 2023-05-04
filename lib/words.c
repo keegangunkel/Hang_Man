@@ -1,6 +1,9 @@
 #include <jansson.h>
 #include <string.h>
 #include "http.h"
+#include <setjmp.h>
+
+jmp_buf buffer;
 
 typedef struct {
   char* letters;
@@ -173,6 +176,11 @@ Word getHangmanWord() {
   int word_ndx = 0;
   for (word_ndx=0; word_ndx<word_count; word_ndx++) {
     json_t* json = parse_json(requests[word_ndx]->response->data);
+    if (!json) {
+      fprintf(stderr, "You're probably being rate limited\n");
+      longjmp(buffer, 1);
+    }
+
     result = wordFromJson(json);
     json_decref(json);
 
