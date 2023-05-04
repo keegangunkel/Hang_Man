@@ -54,6 +54,7 @@ int check()
                     if (guess[guessinx] == word.letters[wordinx])
                     {
                         correct = 1;
+                        boolWord[guessinx] = '1';
                     }
                 }
                 if (correct == 1)
