@@ -3,31 +3,75 @@
 
 /* Library functions found here https://wiki.libsdl.org/SDL2/CategoryAPI */
 
-int main(int argc, char* argv[]) {
-    SDL_Init(SDL_INIT_AUDIO);
-
-    SDL_AudioSpec wavSpec;
+typedef struct {
+    SDL_AudioDeviceID bgmDeviceId;
     Uint8* bgmBuffer;
     Uint32 bgmLength;
-
-    // Load background music into memory
-    SDL_LoadWAV("sounds/background_music.wav", &wavSpec, &bgmBuffer, &bgmLength);
-    SDL_AudioDeviceID bgmDeviceId = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
-
-    // Queue and unpause the background music
-    SDL_QueueAudio(bgmDeviceId, bgmBuffer, bgmLength);
-    SDL_PauseAudioDevice(bgmDeviceId, 0);
-
-    // Load sound effects for guessing right and wrong into memory
+    SDL_AudioDeviceID rightDeviceId;
     Uint8* rightBuffer;
     Uint32 rightLength;
-    SDL_LoadWAV("sounds/correct_sound.wav", &wavSpec, &rightBuffer, &rightLength);
-    SDL_AudioDeviceID rightDeviceId = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
-
+    SDL_AudioDeviceID wrongDeviceId;
     Uint8* wrongBuffer;
     Uint32 wrongLength;
-    SDL_LoadWAV("sounds/wrong_sound.wav", &wavSpec, &wrongBuffer, &wrongLength);
-    SDL_AudioDeviceID wrongDeviceId = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
+    SDL_AudioSpec wavSpec;
+} AudioData;
+
+AudioData initAudio() {
+    SDL_Init(SDL_INIT_AUDIO);
+
+    AudioData audio;
+
+    // Load background music into memory
+    SDL_LoadWAV("sounds/background_music.wav", &audio.wavSpec, &audio.bgmBuffer, &audio.bgmLength);
+    audio.bgmDeviceId = SDL_OpenAudioDevice(NULL, 0, &audio.wavSpec, NULL, 0);
+
+    // Load sound effects for guessing right and wrong into memory
+    SDL_LoadWAV("sounds/correct_sound.wav", &audio.wavSpec, &audio.rightBuffer, &audio.rightLength);
+    audio.rightDeviceId = SDL_OpenAudioDevice(NULL, 0, &audio.wavSpec, NULL, 0);
+
+    SDL_LoadWAV("sounds/wrong_sound.wav", &audio.wavSpec, &audio.wrongBuffer, &audio.wrongLength);
+    audio.wrongDeviceId = SDL_OpenAudioDevice(NULL, 0, &audio.wavSpec, NULL, 0);
+
+    return audio;
+}
+
+void playBackgroundMusic(AudioData audio) {
+    // Queue and unpause the background music
+    SDL_QueueAudio(audio.bgmDeviceId, audio.bgmBuffer, audio.bgmLength);
+    SDL_PauseAudioDevice(audio.bgmDeviceId, 0);
+}
+
+void playCorrectSound(AudioData audio) {
+    // Play sound effect for guessing right
+    SDL_QueueAudio(audio.rightDeviceId, audio.rightBuffer, audio.rightLength);
+    SDL_PauseAudioDevice(audio.rightDeviceId, 0);
+}
+
+void playWrongSound(AudioData audio) {
+    // Play sound effect for guessing wrong
+    SDL_QueueAudio(audio.wrongDeviceId, audio.wrongBuffer, audio.wrongLength);
+    SDL_PauseAudioDevice(audio.wrongDeviceId, 0);
+}
+
+void cleanup(AudioData audio) {
+    // Clean up audio devices and free sound data
+    SDL_CloseAudioDevice(audio.bgmDeviceId);
+    SDL_FreeWAV(audio.bgmBuffer);
+
+    SDL_CloseAudioDevice(audio.rightDeviceId);
+    SDL_FreeWAV(audio.rightBuffer);
+
+    SDL_CloseAudioDevice(audio.wrongDeviceId);
+    SDL_FreeWAV(audio.wrongBuffer);
+
+    SDL_Quit();
+}
+
+int main(int argc, char* argv[]) {
+    AudioData audio = initAudio();
+
+    // Play background music
+    playBackgroundMusic(audio);
 
     // Play guessing game with sound effects
     char guess;
@@ -37,18 +81,13 @@ int main(int argc, char* argv[]) {
 
         switch (guess) {
             case 'c':
-                // Play sound effect for guessing right
-                SDL_QueueAudio(rightDeviceId, rightBuffer, rightLength);
-                SDL_PauseAudioDevice(rightDeviceId, 0);
+                playCorrectSound(audio);
                 break;
             case 'w':
-                // Play sound effect for guessing wrong
-                SDL_QueueAudio(wrongDeviceId, wrongBuffer, wrongLength);
-                SDL_PauseAudioDevice(wrongDeviceId, 0);
+                playWrongSound(audio);
                 break;
             default:
-                return 0;
-                break;
+                goto end;
         }
 
         // Clear input buffer
@@ -57,17 +96,8 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    // Clean up audio devices and free sound data
-    SDL_CloseAudioDevice(bgmDeviceId);
-    SDL_FreeWAV(bgmBuffer);
-
-    SDL_CloseAudioDevice(rightDeviceId);
-    SDL_FreeWAV(rightBuffer);
-
-    SDL_CloseAudioDevice(wrongDeviceId);
-    SDL_FreeWAV(wrongBuffer);
-
-    SDL_Quit();
+end:
+    cleanup(audio);
 
     return 0;
 }
