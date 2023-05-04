@@ -2,8 +2,11 @@
 #include "words.h"
 #include <string.h>
 
-int check()
+const char *check()
 {
+    // first one is letters of truth in word second is wrong and third is correct
+    char wordData[3][26];
+
     Word word = getHangmanWord();
     int wordLen = strlen(word.letters);
     printf("DEBUG: %s (%d)\n", word.letters, wordLen);
@@ -23,8 +26,8 @@ int check()
         boolWord[i] = '0';
         constructWord[i] = '1';
     }
-    
-    // 
+
+    //
 
     // to be implemented
     int correctCount = 0;
@@ -51,16 +54,15 @@ int check()
                 for (int wordinx = 0; wordinx < 32; wordinx++)
                 {
                     // checks if right
-                    printf(" test %i,    %i \n", guess[guessinx], word.letters[wordinx]);
+                    // printf(" test %i,    %i \n", guess[guessinx], word.letters[wordinx]);
                     if (guess[guessinx] == word.letters[wordinx])
                     {
                         correct = 1;
                         boolWord[wordinx] = '1';
 
                         correctGuesses[guessinx] = guess[guessinx];
-                        points = bonus * scoreMultiplyer;
-                        //printf("Your smart %d    %s\n", correctCount, boolWord);
                         printf("Your smart %d    %s\n", correctCount, boolWord);
+                        // printf("Your smart %d    %s\n", correctCount, boolWord);
                     }
                 }
                 if (correct == 1)
@@ -70,11 +72,11 @@ int check()
                     {
                         boolWord[guessinx] = '1';
                         correctGuesses[guessinx] = guess[guessinx];
+                        points = bonus * scoreMultiplyer;
+                        // correctCount = correctCount + 1;
+                        //  implment score later
 
-                        //correctCount = correctCount + 1;
-                        // implment score later
-
-                        printf("Your smart %d    %s\n", correctCount, boolWord);
+                        // printf("Your smart %d    %s\n", correctCount, boolWord);
                     }
                 }
                 else
@@ -92,18 +94,24 @@ int check()
 
                 correct = 0;
             }
+
+            if (!lives)
+            {
+                printf("Game Over\n");
+            }
+
+            printf("words are %s    %s \n", constructWord, boolWord);
+            boolWord[strlen(boolWord)-1] = '\0';
+            if (atoi(constructWord) == atoi(boolWord))
+            {
+                printf("You completed word (%d pts)\n", points);
+                lives = 0;
+            }
         }
-    }
-    if (!lives)
-      { printf("Game Over\n"); }
-    if (constructWord == boolWord)
-    {
-        printf("You completed word (%d pts)\n", points);
-        lives = 0;
     }
 
     printf("_________________________\n");
     freeWord(word);
 
-    return 0;
+    return boolWord, wrongGuesses, correctGuesses;
 }
