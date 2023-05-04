@@ -21,7 +21,7 @@ int check()
     for (int i = 0; i < wordLen - 1; i++)
     {
         boolWord[i] = '0';
-        constructWord[i] = '0';
+        constructWord[i] = '1';
     }
     
     // 
@@ -51,9 +51,16 @@ int check()
                 for (int wordinx = 0; wordinx < 32; wordinx++)
                 {
                     // checks if right
+                    printf(" test %i,    %i \n", guess[guessinx], word.letters[wordinx]);
                     if (guess[guessinx] == word.letters[wordinx])
                     {
                         correct = 1;
+                        boolWord[wordinx] = '1';
+
+                        correctGuesses[guessinx] = guess[guessinx];
+                        points = bonus * scoreMultiplyer;
+                        //printf("Your smart %d    %s\n", correctCount, boolWord);
+                        printf("Your smart %d    %s\n", correctCount, boolWord);
                     }
                 }
                 if (correct == 1)
@@ -64,9 +71,8 @@ int check()
                         boolWord[guessinx] = '1';
                         correctGuesses[guessinx] = guess[guessinx];
 
-                        correctCount = correctCount + 1;
+                        //correctCount = correctCount + 1;
                         // implment score later
-                        points = bonus * scoreMultiplyer;
 
                         printf("Your smart %d    %s\n", correctCount, boolWord);
                     }

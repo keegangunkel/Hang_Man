@@ -1,20 +1,8 @@
 #include <SDL2/SDL.h>
 #include <stdio.h>
+#include "sound.h"
 
 /* Library functions found here https://wiki.libsdl.org/SDL2/CategoryAPI */
-
-typedef struct {
-    SDL_AudioDeviceID bgmDeviceId;
-    Uint8* bgmBuffer;
-    Uint32 bgmLength;
-    SDL_AudioDeviceID rightDeviceId;
-    Uint8* rightBuffer;
-    Uint32 rightLength;
-    SDL_AudioDeviceID wrongDeviceId;
-    Uint8* wrongBuffer;
-    Uint32 wrongLength;
-    SDL_AudioSpec wavSpec;
-} AudioData;
 
 AudioData initAudio() {
     SDL_Init(SDL_INIT_AUDIO);
@@ -53,7 +41,7 @@ void playWrongSound(AudioData audio) {
     SDL_PauseAudioDevice(audio.wrongDeviceId, 0);
 }
 
-void cleanup(AudioData audio) {
+void cleanupAudio(AudioData audio) {
     // Clean up audio devices and free sound data
     SDL_CloseAudioDevice(audio.bgmDeviceId);
     SDL_FreeWAV(audio.bgmBuffer);
@@ -67,6 +55,7 @@ void cleanup(AudioData audio) {
     SDL_Quit();
 }
 
+/*
 int main(int argc, char* argv[]) {
     AudioData audio = initAudio();
 
@@ -101,3 +90,4 @@ end:
 
     return 0;
 }
+*/
