@@ -2,10 +2,10 @@
 #include "words.h"
 #include <string.h>
 
-const char *check()
+void /*const char* */check()
 {
     // first one is letters of truth in word second is wrong and third is correct
-    char wordData[3][26];
+    //char wordData[3][26]; //unused? -Cooper
 
     Word word = getHangmanWord();
     int wordLen = strlen(word.letters);
@@ -113,5 +113,6 @@ const char *check()
     printf("_________________________\n");
     freeWord(word);
 
-    return boolWord, wrongGuesses, correctGuesses;
+    return;
+    //return boolWord, wrongGuesses, correctGuesses;
 }
