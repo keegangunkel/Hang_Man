@@ -3,6 +3,27 @@
 #include <stdio.h>
 #include <string.h>
 
+#define GRN "\033[32m"
+#define RED "\033[31m"
+#define DFLT "\033[0m"
+
+/*
+ * Function to print the character bank
+ * https://stackoverflow.com/questions/523724/c-c-check-if-one-bit-is-set-in-i-e-int-variable
+ * @param correct {unsigned int}:BITMAP#26 - if bit set, print alphabet position green
+ * @param incorrect {unsigned int}:BITMAP#26 - if bit set, print alphabet position red
+*/
+void print_char_bank(unsigned int correct, unsigned int incorrect) {
+  for (char c = 'A'; c <= 'Z'; c++) {
+    if (correct & (1 << (c - 'A')))
+      { printf(GRN); }
+    else if (incorrect & (1 << (c - 'A')))
+      { printf(RED); }
+    printf("%c" DFLT, c);
+  }
+  printf("\n");
+  return;
+}
 
 void clear_screen()
   { system("clear"); }
