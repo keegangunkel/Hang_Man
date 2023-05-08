@@ -9,6 +9,7 @@
 
 /*
  * Function to print the character bank
+ * https://www.programiz.com/c-programming/examples/display-alphabets
  * https://stackoverflow.com/questions/523724/c-c-check-if-one-bit-is-set-in-i-e-int-variable
  * @param correct {unsigned int}:BITMAP#26 - if bit set, print alphabet position green
  * @param incorrect {unsigned int}:BITMAP#26 - if bit set, print alphabet position red
