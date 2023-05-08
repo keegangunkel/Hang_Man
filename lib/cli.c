@@ -16,9 +16,11 @@
 */
 void print_char_bank(unsigned int correct, unsigned int incorrect) {
   for (char c = 'A'; c <= 'Z'; c++) {
-    if (correct & (1 << (c - 'A')))
+    unsigned pos = 1 << (c - 'A');
+
+    if (correct & pos)
       { printf(GRN); }
-    else if (incorrect & (1 << (c - 'A')))
+    else if (incorrect & pos)
       { printf(RED); }
     printf("%c" DFLT, c);
   }
