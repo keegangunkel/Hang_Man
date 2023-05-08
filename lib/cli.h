@@ -1,6 +1,5 @@
 /*
  * Library for drawing frames in a command line interface
-void clear_screen();
 char[] get_guess();
 */
 
@@ -10,6 +9,7 @@ typedef struct {
   char** grid;
 } Frame;
 
+void clear_screen();
 Frame* frameFromFile(const char* path);
 void printFrame(Frame* frame);
 void freeFrame(Frame* frame);

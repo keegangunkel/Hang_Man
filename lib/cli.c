@@ -4,6 +4,9 @@
 #include <string.h>
 
 
+void clear_screen()
+  { system("clear"); }
+
 /* https://stackoverflow.com/questions/174531/how-to-read-the-content-of-a-file-to-a-string-in-c */
 char* read_file(const char* path) {
   FILE* file = fopen(path, "r");
