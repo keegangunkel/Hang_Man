@@ -18,7 +18,7 @@ char* read_file(const char* path) {
   fseek(file, 0, SEEK_SET);
 
   char* buf = malloc(size + 1);
-  if (fread(buf, 1, size, file) != size) {
+  if (fread(buf, 1, size, file) != (size_t)size) {
     fprintf(stderr, "Error reading file %s\n", path);
     free(buf);
     fclose(file);
