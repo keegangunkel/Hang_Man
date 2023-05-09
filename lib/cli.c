@@ -9,82 +9,52 @@
 #define DFLT "\033[0m"
 
 /*
- * Function to print the character bank
+ * Function to load the word bank into a `frame` structure
+ * There are at most 7 letters per line, surrounded by a frame
+ * @param correct {BITMAP#26} - HIGH prints green
+ * @param incorrect {BITMAP#26} - HIGH prints red
+ * @return must be free'd with freeFrame
  * https://www.programiz.com/c-programming/examples/display-alphabets
  * https://stackoverflow.com/questions/523724/c-c-check-if-one-bit-is-set-in-i-e-int-variable
- * @param correct {unsigned int}:BITMAP#26 - if bit set, print alphabet position green
- * @param incorrect {unsigned int}:BITMAP#26 - if bit set, print alphabet position red
+ * https://stackoverflow.com/questions/2674312/how-to-append-strings-using-sprintf
 */
-void print_char_bank(unsigned int correct, unsigned int incorrect) {
-  for (char c = 'A'; c <= 'Z'; c++) {
-    unsigned pos = 1 << (c - 'A');
-
-    if (correct & pos)
-      { printf(GRN); }
-    else if (incorrect & pos)
-      { printf(RED); }
-    printf("%c" DFLT, c);
-  }
-  printf("\n");
-  return;
-}
-
-/*
-There are 7 letters per line
-Each `char` is actually a max of 10 and a min of 5
-*/
-Frame* word_bank(unsigned correct, unsigned incorrect) {
-  int rows = 6;
-  int cols = 75; // 7 letters per line, max 11 characters for color changing + 4 for padding, 1 for null: 7 * 11 + 4 + 1
+Frame* make_word_bank(unsigned correct, unsigned incorrect) {
+  const int rows = 6;
+  const int letters_per_row = 7;
+  const int cols = letters_per_row * 11 + 5; // 11 chars per letter (color codes), 4 chars for padding, 1 char for null
   char matrix[rows][cols];
+  memset(matrix, '\0', sizeof(matrix));
 
-  int dash_count = 7*2+4;
-  for (int c=0; c<dash_count; c++) {
-    matrix[0][c] = '-';
-    matrix[rows-1][c] = '-';
-  }
-  matrix[0][dash_count] = '\0';
-  matrix[rows-1][dash_count] = '\0';
-  matrix[1][0] = '|';
-  matrix[1][1] = ' ';
+  // Draw the outline
+  int outline_width = letters_per_row * 2 + 4;
+  memset(matrix[0], '-', outline_width);
+  memset(matrix[rows-1], '-', outline_width);
+  for (int r=1; r<rows-1; r++)
+    { sprintf(matrix[r], "| "); }
 
-  int row = 1;
-  int col = 2;
+  int row = 0;
+  int col = cols-1;
   for (char c = 'A'; c <= 'Z'; c++) {
-    if (c == 'H' || c == 'O' || c == 'V') {
+
+    // End the line if letters per row met
+    if (!((c - 'A') % letters_per_row)) {
       matrix[row][col] = '|';
-      matrix[row][col+1] = '\0';
       row++;
       col = 2;
-      matrix[row][0] = '|';
-      matrix[row][1] = ' ';
     }
 
+    // Set the color, add the character, reset the color
     unsigned char_pos = 1 << (c - 'A');
-    if (correct & char_pos) {
-      matrix[row][col] = '\033';
-      matrix[row][col+1] = '[';
-      matrix[row][col+2] = '3';
-      matrix[row][col+3] = '2';
-      matrix[row][col+4] = 'm';
-      col += 5;
-    }
-    else if (incorrect & char_pos) {
-      matrix[row][col] = '\033';
-      matrix[row][col+1] = '[';
-      matrix[row][col+2] = '3';
-      matrix[row][col+3] = '1';
-      matrix[row][col+4] = 'm';
-      col += 5;
-    }
-    matrix[row][col] = c;
-    matrix[row][col+1] = ' ';
-    matrix[row][col+2] = '\033';
-    matrix[row][col+3] = '[';
-    matrix[row][col+4] = '0';
-    matrix[row][col+5] = 'm';
-    col += 6;
-  }
+    if (correct & char_pos)
+      { col += sprintf(matrix[row] + col, GRN); }
+    else if (incorrect & char_pos)
+      { col += sprintf(matrix[row] + col, RED); }
+    col += sprintf(matrix[row] + col, "%c " DFLT, c);
+
+  } //for loop
+
+  // Add remaining spaces
+  sprintf(matrix[row] + col, "%*c", 25 % letters_per_row + 1, '|'); // Z - A = 25
 
   Frame* frame = frameFromMatrix(rows, cols, matrix);
   return frame;
