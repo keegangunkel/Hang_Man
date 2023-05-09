@@ -3,8 +3,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#define GRN "\033[32m"
-#define RED "\033[31m"
+/* colors */
+#define GRN  "\033[32m"
+#define RED  "\033[31m"
 #define DFLT "\033[0m"
 
 /*
@@ -26,6 +27,67 @@ void print_char_bank(unsigned int correct, unsigned int incorrect) {
   }
   printf("\n");
   return;
+}
+
+/*
+There are 7 letters per line
+Each `char` is actually a max of 10 and a min of 5
+*/
+Frame* word_bank(unsigned correct, unsigned incorrect) {
+  int rows = 6;
+  int cols = 75; // 7 letters per line, max 11 characters for color changing + 4 for padding, 1 for null: 7 * 11 + 4 + 1
+  char matrix[rows][cols];
+
+  int dash_count = 7*2+4;
+  for (int c=0; c<dash_count; c++) {
+    matrix[0][c] = '-';
+    matrix[rows-1][c] = '-';
+  }
+  matrix[0][dash_count] = '\0';
+  matrix[rows-1][dash_count] = '\0';
+  matrix[1][0] = '|';
+  matrix[1][1] = ' ';
+
+  int row = 1;
+  int col = 2;
+  for (char c = 'A'; c <= 'Z'; c++) {
+    if (c == 'H' || c == 'O' || c == 'V') {
+      matrix[row][col] = '|';
+      matrix[row][col+1] = '\0';
+      row++;
+      col = 2;
+      matrix[row][0] = '|';
+      matrix[row][1] = ' ';
+    }
+
+    unsigned char_pos = 1 << (c - 'A');
+    if (correct & char_pos) {
+      matrix[row][col] = '\033';
+      matrix[row][col+1] = '[';
+      matrix[row][col+2] = '3';
+      matrix[row][col+3] = '2';
+      matrix[row][col+4] = 'm';
+      col += 5;
+    }
+    else if (incorrect & char_pos) {
+      matrix[row][col] = '\033';
+      matrix[row][col+1] = '[';
+      matrix[row][col+2] = '3';
+      matrix[row][col+3] = '1';
+      matrix[row][col+4] = 'm';
+      col += 5;
+    }
+    matrix[row][col] = c;
+    matrix[row][col+1] = ' ';
+    matrix[row][col+2] = '\033';
+    matrix[row][col+3] = '[';
+    matrix[row][col+4] = '0';
+    matrix[row][col+5] = 'm';
+    col += 6;
+  }
+
+  Frame* frame = frameFromMatrix(rows, cols, matrix);
+  return frame;
 }
 
 void clear_screen()
@@ -57,11 +119,43 @@ char* read_file(const char* path) {
   return buf;
 }
 
+/*
+ * Generate a frame from a character matrix
+ * Return must be free'd with freeFrame 
+*/
+Frame* frameFromMatrix(int rows, int cols, char matrix[rows][cols]) {
+  Frame* frame = calloc(sizeof(Frame), 0);
+  if (!frame) {
+    fprintf(stderr, "Faile to find memory for matrix frame\n");
+    return NULL;
+  }
+
+  frame->rows = rows;
+  frame->cols = cols;
+  frame->grid = calloc(rows, sizeof(char*));
+  if (!frame->grid) {
+    fprintf(stderr, "Failed to calloc frame grid\n");
+    freeFrame(frame);
+    return NULL;
+  }
+
+  for (int i=0; i<rows; i++) {
+    frame->grid[i] = calloc(cols + 1, sizeof(char));
+    if (!frame->grid[i]) {
+      fprintf(stderr, "Failed to calloc matrix element\n");
+      freeFrame(frame);
+      return NULL;
+    }
+    strncpy(frame->grid[i], matrix[i], cols);
+  }
+  return frame;
+}
+
 /* return must be free'd with freeFrame */
 Frame* frameFromFile(const char* path) {
   Frame* frame = calloc(sizeof(Frame), 0);
   if (!frame) {
-    fprintf(stderr, "Failed to find memory for a frame\n");
+    fprintf(stderr, "Failed to find memory for file frame\n");
     return NULL;
   }
   char* file_content = read_file(path);
@@ -100,6 +194,11 @@ Frame* frameFromFile(const char* path) {
 
 void printFrame(Frame* frame) {
   for (int i=0; i<frame->rows; i++) {
+    /*
+    for(int c=0; c<frame->cols; c++) {
+      printf("%c = %d\n", frame->grid[i][c], frame->grid[i][c]);
+    }
+    */
     printf("%s\n", frame->grid[i]);
   }
   return;
