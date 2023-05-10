@@ -153,6 +153,10 @@ int getVisibleLength(const char* str) {
   return result;
 }
 
+/*
+ * Function to add a border to an existing frame
+ * Also decide how many blank rows/cols to add as padding
+*/
 void addBorderToFrame(Frame* frame, int vpad, int hpad) {
   int outline_width = getVisibleLength(frame->grid[0]) + 2 + 2*hpad;
   int outline_bytes = outline_width * 3;
@@ -162,13 +166,14 @@ void addBorderToFrame(Frame* frame, int vpad, int hpad) {
   const char top_lft[] = "\u250C";
   const char top_rgt[] = "\u2510";
   const char bot_lft[] = "\u2514";
-  const char bot_rgt[] = "\u256F";
+  const char bot_rgt[] = "\u2518";
 
   // update frame props
   int orig_rows = frame->rows;
-  //int orig_cols = frame->cols;
   frame->rows += 2 + 2*vpad;
   frame->cols += 2 + 2*hpad;
+  if (outline_bytes > frame->cols)
+    { frame->cols = outline_bytes + 1; }
 
   // Setting some new mem
   char** new_grid = malloc(frame->rows * sizeof(char*));
