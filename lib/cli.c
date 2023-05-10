@@ -153,8 +153,8 @@ int getVisibleLength(const char* str) {
   return result;
 }
 
-void addBorderToFrame(Frame* frame, int vpad) {
-  int outline_width = getVisibleLength(frame->grid[0]) + 4;
+void addBorderToFrame(Frame* frame, int vpad, int hpad) {
+  int outline_width = getVisibleLength(frame->grid[0]) + 2 + 2*hpad;
   int outline_bytes = outline_width * 3;
 
   const char vert_line[] = { '\xE2', '\x94', '\x82', '\0' };
@@ -168,7 +168,7 @@ void addBorderToFrame(Frame* frame, int vpad) {
   int orig_rows = frame->rows;
   //int orig_cols = frame->cols;
   frame->rows += 2 + 2*vpad;
-  frame->cols += 2;
+  frame->cols += 2 + 2*hpad;
 
   // Setting some new mem
   char** new_grid = malloc(frame->rows * sizeof(char*));
@@ -194,8 +194,9 @@ void addBorderToFrame(Frame* frame, int vpad) {
     sprintf(new_grid[frame->rows - i - 1], "%s%*c%s", vert_line, outline_width - 2, ' ', vert_line);
   }
 
+  // Fill in the content rows
   for (int i=0; i<orig_rows; i++) {
-    sprintf(new_grid[i+1+vpad], "%s %s %s", vert_line, frame->grid[i], vert_line);
+    sprintf(new_grid[i+1+vpad], "%s%*s%s%*s%s", vert_line, hpad, "", frame->grid[i], hpad, "", vert_line);
   }
 
   frame->grid = new_grid;
@@ -247,6 +248,6 @@ Frame* make_word_bank(unsigned correct, unsigned incorrect) {
   sprintf(matrix[row] + col, "%*c", 25 % letters_per_row - 1, ' ');
 
   Frame* frame = frameFromMatrix(rows, cols, matrix);
-  addBorderToFrame(frame, 0);
+  addBorderToFrame(frame, 0, 1);
   return frame;
 }
