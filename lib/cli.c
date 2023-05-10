@@ -120,7 +120,8 @@ Frame* frameFromMatrix(int rows, int cols, char matrix[rows][cols]) {
  * Also decide how many blank rows/cols to add as padding
 */
 void addBorderToFrame(Frame* frame, int vpad, int hpad) {
-  int outline_width = getVisibleLength(frame->grid[0]) + 2 + 2*hpad;
+  int col_inc = 2 + 2 * hpad;
+  int outline_width = getVisibleLength(frame->grid[0]) + col_inc;
   int outline_bytes = outline_width * 3;
 
   const char vert_line[] = { '\xE2', '\x94', '\x82', '\0' };
@@ -133,7 +134,7 @@ void addBorderToFrame(Frame* frame, int vpad, int hpad) {
   // update frame props
   int orig_rows = frame->rows;
   frame->rows += 2 + 2*vpad;
-  frame->cols += 2 + 2*hpad;
+  frame->cols += col_inc;
   if (outline_bytes > frame->cols)
     { frame->cols = outline_bytes + 1; }
 
@@ -143,17 +144,14 @@ void addBorderToFrame(Frame* frame, int vpad, int hpad) {
     { new_grid[i] = malloc(frame->cols * sizeof(char)); }
 
   // Fill the frame's top and bottom rows
-  for (int i=0; i<outline_bytes-1; i+=3) {
+  sprintf(new_grid[0], "%s", top_lft);
+  sprintf(new_grid[frame->rows - 1], "%s", bot_lft);
+  for (int i=3; i<outline_bytes-3; i+=3) {
     sprintf(new_grid[0] + i, "%s", horz_line);
     sprintf(new_grid[frame->rows-1] + i, "%s", horz_line);
   }
-  char tmp = new_grid[0][3]; // this char will be overwritten by \0 in sprintf
-  sprintf(new_grid[0], "%s", top_lft);
   sprintf(new_grid[0] + outline_bytes - 3, "%s", top_rgt);
-  sprintf(new_grid[frame->rows - 1], "%s", bot_lft);
   sprintf(new_grid[frame->rows - 1] + outline_bytes - 3, "%s", bot_rgt);
-  new_grid[0][3] = tmp;
-  new_grid[frame->rows - 1][3] = tmp;
 
   // Fill the frames new vpad rows
   for (int i=1; i<vpad+1; i++) {
@@ -184,13 +182,12 @@ Frame* make_word_bank(unsigned correct, unsigned incorrect) {
   /* Configurable vars */
   const int rows = 4;
   const int letters_per_row = 7;
-  /* */
   const int cols = letters_per_row * 11; // 11 chars per letter (color codes), 4 chars for padding, 1 char for null
   char matrix[rows][cols];
   memset(matrix, '\0', sizeof(matrix));
 
   int row = -1;
-  int col = 0; // why? good question
+  int col = 0;
   for (char c = 'A'; c <= 'Z'; c++) {
 
     // End the line if letters per row met
