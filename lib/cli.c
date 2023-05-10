@@ -143,15 +143,17 @@ Frame* frameFromMatrix(int rows, int cols, char matrix[rows][cols]) {
  * https://stackoverflow.com/questions/2674312/how-to-append-strings-using-sprintf
 */
 Frame* make_word_bank(unsigned correct, unsigned incorrect) {
-  char vert_line[] = { '\xE2', '\x94', '\x82', '\0' };
-  char horz_line[] = { '\xE2', '\x94', '\x80', '\0' };
-
+  /* Configurable vars */
   const int rows = 6;
   const int letters_per_row = 7;
+  /* */
+  const char vert_line[] = { '\xE2', '\x94', '\x82', '\0' };
+  const char horz_line[] = { '\xE2', '\x94', '\x80', '\0' };
   const int cols = letters_per_row * 11 + 5; // 11 chars per letter (color codes), 4 chars for padding, 1 char for null
   char matrix[rows][cols];
   memset(matrix, '\0', sizeof(matrix));
 
+  // TODO -- Make a separate function called `outline frame` or something of that nature
   // Draw the outline
   int outline_width = letters_per_row * 2 + 2;
   for (int i=0; i<outline_width*3-1; i+=3) {
