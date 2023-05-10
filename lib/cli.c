@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
+#include <wchar.h>
 
 /* colors */
 #define GRN  "\033[32m"
@@ -135,7 +137,26 @@ Frame* frameFromMatrix(int rows, int cols, char matrix[rows][cols]) {
   return frame;
 }
 
+/* Function to count characters in string, ignoring escape sequences */
+int getVisibleLength(const char* str) {
+  int result = 0;
+  int escaping = 0;
+  const char esc_code = '\x1B';
+  const char end_esc_code = '\x6D';
+
+  for (int i=0; str[i] != '\0'; i++) {
+    if (esc_code == str[i]) { escaping = 1; }
+    if (!escaping) { result += 1; continue; }
+
+    if (end_esc_code == str[i]) { escaping = 0; }
+  }
+  return result;
+}
+
 void addBorderToFrame(Frame* frame) {
+  int outline_width = getVisibleLength(frame->grid[0]) + 4;
+  int outline_bytes = outline_width * 3;
+
   const char vert_line[] = { '\xE2', '\x94', '\x82', '\0' };
   const char horz_line[] = { '\xE2', '\x94', '\x80', '\0' };
   const char top_lft[] = "\u250C";
@@ -155,13 +176,20 @@ void addBorderToFrame(Frame* frame) {
     { new_grid[i] = malloc(frame->cols * sizeof(char)); }
 
   // Fill the frame
-  memset(new_grid[0], '-', frame->cols);
-  memset(new_grid[frame->rows - 1], '-', frame->cols);
+  for (int i=0; i<outline_bytes-1; i+=3) {
+    sprintf(new_grid[0] + i, "%s", horz_line);
+    sprintf(new_grid[frame->rows-1] + i, "%s", horz_line);
+  }
+  char tmp = new_grid[0][3]; // this char will be overwritten by \0 in sprintf
+  sprintf(new_grid[0], "%s", top_lft);
+  sprintf(new_grid[0] + outline_bytes - 3, "%s", top_rgt);
+  sprintf(new_grid[frame->rows - 1], "%s", bot_lft);
+  sprintf(new_grid[frame->rows - 1] + outline_bytes - 3, "%s", bot_rgt);
+  new_grid[0][3] = tmp;
+  new_grid[frame->rows - 1][3] = tmp;
+
   for (int i=1; i<frame->rows-1; i++) {
-    new_grid[i][0] = '|';
-    new_grid[i][1] = ' ';
-    int written = sprintf(new_grid[i] + 2, "%s", frame->grid[i-1]);
-    new_grid[i][written + 2] = '|';
+    sprintf(new_grid[i], "%s %s %s", vert_line, frame->grid[i-1], vert_line);
   }
 
   frame->grid = new_grid;
@@ -183,27 +211,9 @@ Frame* make_word_bank(unsigned correct, unsigned incorrect) {
   const int rows = 4;
   const int letters_per_row = 7;
   /* */
-  const int cols = letters_per_row * 11 + 5; // 11 chars per letter (color codes), 4 chars for padding, 1 char for null
+  const int cols = letters_per_row * 11; // 11 chars per letter (color codes), 4 chars for padding, 1 char for null
   char matrix[rows][cols];
   memset(matrix, '\0', sizeof(matrix));
-
-  /*
-  // Draw the outline
-  int outline_width = letters_per_row * 2 + 2;
-  for (int i=0; i<outline_width*3-1; i+=3) {
-    sprintf(matrix[0] + i, "%s", horz_line);
-    sprintf(matrix[rows-1] + i, "%s", horz_line);
-  }
-  for (int r=1; r<rows-1; r++)
-    { sprintf(matrix[r], "%s ", vert_line); }
-  char tmp = matrix[0][3]; // this char is going to be overwritten by \0 in sprintf
-  sprintf(matrix[0], "%s", "\u250C");                  // top lft
-  sprintf(matrix[0] + outline_width*3, "\u2510");      // top rgt
-  sprintf(matrix[rows-1], "\u2514");                   // bot lft
-  sprintf(matrix[rows-1] + outline_width*3, "\u256F"); // bot rgt
-  matrix[0][3] = tmp;
-  matrix[rows-1][3] = tmp;
-  */
 
   int row = -1;
   int col = 0; // why? good question
@@ -211,6 +221,7 @@ Frame* make_word_bank(unsigned correct, unsigned incorrect) {
 
     // End the line if letters per row met
     if (!((c - 'A') % letters_per_row)) {
+      matrix[row][col-1] = '\0'; // get rid of the extra space
       row++;
       col = 0;
     }
@@ -221,12 +232,13 @@ Frame* make_word_bank(unsigned correct, unsigned incorrect) {
       { col += sprintf(matrix[row] + col, GRN); }
     else if (incorrect & char_pos)
       { col += sprintf(matrix[row] + col, RED); }
-    col += sprintf(matrix[row] + col, "%c " DFLT, c);
+    col += sprintf(matrix[row] + col, "%c" DFLT, c);
+    col += sprintf(matrix[row] + col, " "); //seperate by space
 
   } //for loop
 
   // Add remaining spaces
-  sprintf(matrix[row] + col, "%*c", 25 % letters_per_row, ' ');
+  sprintf(matrix[row] + col, "%*c", 25 % letters_per_row - 1, ' ');
 
   Frame* frame = frameFromMatrix(rows, cols, matrix);
   addBorderToFrame(frame);
