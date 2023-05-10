@@ -10,6 +10,10 @@
 #define RED  "\033[31m"
 #define DFLT "\033[0m"
 
+/* UTILITY FUNCTIONS */
+int getVisibleLength(const char* str);
+char* read_file(const char* path);
+
 
 
 void clear_screen()
@@ -36,32 +40,6 @@ void freeFrame(Frame* frame) {
   free(frame->grid);
   free(frame);
   return;
-}
-
-/* https://stackoverflow.com/questions/174531/how-to-read-the-content-of-a-file-to-a-string-in-c */
-char* read_file(const char* path) {
-  FILE* file = fopen(path, "r");
-  if (file == NULL) {
-    fprintf(stderr, "I/O Error opening %s\n", path);
-    return NULL;
-  }
-
-  // file size
-  fseek(file, 0, SEEK_END);
-  long size = ftell(file);
-  fseek(file, 0, SEEK_SET);
-
-  char* buf = malloc(size + 1);
-  if (fread(buf, 1, size, file) != (size_t)size) {
-    fprintf(stderr, "Error reading file %s\n", path);
-    free(buf);
-    fclose(file);
-    return NULL;
-  }
-
-  buf[size] = '\0'; // null terminate if not already
-  fclose(file);
-  return buf;
 }
 
 /* return must be free'd with freeFrame */
@@ -135,22 +113,6 @@ Frame* frameFromMatrix(int rows, int cols, char matrix[rows][cols]) {
     strncpy(frame->grid[i], matrix[i], cols);
   }
   return frame;
-}
-
-/* Function to count characters in string, ignoring escape sequences */
-int getVisibleLength(const char* str) {
-  int result = 0;
-  int escaping = 0;
-  const char esc_code = '\x1B';
-  const char end_esc_code = '\x6D';
-
-  for (int i=0; str[i] != '\0'; i++) {
-    if (esc_code == str[i]) { escaping = 1; }
-    if (!escaping) { result += 1; continue; }
-
-    if (end_esc_code == str[i]) { escaping = 0; }
-  }
-  return result;
 }
 
 /*
@@ -255,4 +217,52 @@ Frame* make_word_bank(unsigned correct, unsigned incorrect) {
   Frame* frame = frameFromMatrix(rows, cols, matrix);
   addBorderToFrame(frame, 0, 1);
   return frame;
+}
+
+
+
+
+
+
+
+/* Function to count characters in string, ignoring escape sequences */
+int getVisibleLength(const char* str) {
+  int result = 0;
+  int escaping = 0;
+  const char esc_code = '\x1B';
+  const char end_esc_code = '\x6D';
+
+  for (int i=0; str[i] != '\0'; i++) {
+    if (esc_code == str[i]) { escaping = 1; }
+    if (!escaping) { result += 1; continue; }
+
+    if (end_esc_code == str[i]) { escaping = 0; }
+  }
+  return result;
+}
+
+/* https://stackoverflow.com/questions/174531/how-to-read-the-content-of-a-file-to-a-string-in-c */
+char* read_file(const char* path) {
+  FILE* file = fopen(path, "r");
+  if (file == NULL) {
+    fprintf(stderr, "I/O Error opening %s\n", path);
+    return NULL;
+  }
+
+  // file size
+  fseek(file, 0, SEEK_END);
+  long size = ftell(file);
+  fseek(file, 0, SEEK_SET);
+
+  char* buf = malloc(size + 1);
+  if (fread(buf, 1, size, file) != (size_t)size) {
+    fprintf(stderr, "Error reading file %s\n", path);
+    free(buf);
+    fclose(file);
+    return NULL;
+  }
+
+  buf[size] = '\0'; // null terminate if not already
+  fclose(file);
+  return buf;
 }
