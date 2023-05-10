@@ -143,6 +143,9 @@ Frame* frameFromMatrix(int rows, int cols, char matrix[rows][cols]) {
  * https://stackoverflow.com/questions/2674312/how-to-append-strings-using-sprintf
 */
 Frame* make_word_bank(unsigned correct, unsigned incorrect) {
+  char vert_line[] = { '\xE2', '\x94', '\x82', '\0' };
+  char horz_line[] = { '\xE2', '\x94', '\x80', '\0' };
+
   const int rows = 6;
   const int letters_per_row = 7;
   const int cols = letters_per_row * 11 + 5; // 11 chars per letter (color codes), 4 chars for padding, 1 char for null
@@ -150,21 +153,30 @@ Frame* make_word_bank(unsigned correct, unsigned incorrect) {
   memset(matrix, '\0', sizeof(matrix));
 
   // Draw the outline
-  int outline_width = letters_per_row * 2 + 4;
-  memset(matrix[0], '-', outline_width);
-  memset(matrix[rows-1], '-', outline_width);
+  int outline_width = letters_per_row * 2 + 2;
+  for (int i=0; i<outline_width*3-1; i+=3) {
+    sprintf(matrix[0] + i, "%s", horz_line);
+    sprintf(matrix[rows-1] + i, "%s", horz_line);
+  }
   for (int r=1; r<rows-1; r++)
-    { sprintf(matrix[r], "| "); }
+    { sprintf(matrix[r], "%s ", vert_line); }
+  char tmp = matrix[0][3]; // this char is going to be overwritten by \0 in sprintf
+  sprintf(matrix[0], "%s", "\u250C");                  // top lft
+  sprintf(matrix[0] + outline_width*3, "\u2510");      // top rgt
+  sprintf(matrix[rows-1], "\u2514");                   // bot lft
+  sprintf(matrix[rows-1] + outline_width*3, "\u256F"); // bot rgt
+  matrix[0][3] = tmp;
+  matrix[rows-1][3] = tmp;
 
   int row = 0;
-  int col = cols-1;
+  int col = cols-5; // why? good question
   for (char c = 'A'; c <= 'Z'; c++) {
 
     // End the line if letters per row met
     if (!((c - 'A') % letters_per_row)) {
-      matrix[row][col] = '|';
+      sprintf(matrix[row] + col, "%s", vert_line);
       row++;
-      col = 2;
+      col = 4;
     }
 
     // Set the color, add the character, reset the color
@@ -178,7 +190,7 @@ Frame* make_word_bank(unsigned correct, unsigned incorrect) {
   } //for loop
 
   // Add remaining spaces
-  sprintf(matrix[row] + col, "%*c", 25 % letters_per_row + 1, '|'); // Z - A = 25
+  sprintf(matrix[row] + col, "%*s", 25 % letters_per_row + 3, vert_line); // Z - A = 25 //+3 because 3 char in vert_line?
 
   Frame* frame = frameFromMatrix(rows, cols, matrix);
   return frame;
