@@ -153,7 +153,7 @@ int getVisibleLength(const char* str) {
   return result;
 }
 
-void addBorderToFrame(Frame* frame) {
+void addBorderToFrame(Frame* frame, int vpad) {
   int outline_width = getVisibleLength(frame->grid[0]) + 4;
   int outline_bytes = outline_width * 3;
 
@@ -166,8 +166,8 @@ void addBorderToFrame(Frame* frame) {
 
   // update frame props
   int orig_rows = frame->rows;
-  int orig_cols = frame->cols;
-  frame->rows += 2;
+  //int orig_cols = frame->cols;
+  frame->rows += 2 + 2*vpad;
   frame->cols += 2;
 
   // Setting some new mem
@@ -175,7 +175,7 @@ void addBorderToFrame(Frame* frame) {
   for (int i=0; i<frame->rows; i++)
     { new_grid[i] = malloc(frame->cols * sizeof(char)); }
 
-  // Fill the frame
+  // Fill the frame's top and bottom rows
   for (int i=0; i<outline_bytes-1; i+=3) {
     sprintf(new_grid[0] + i, "%s", horz_line);
     sprintf(new_grid[frame->rows-1] + i, "%s", horz_line);
@@ -188,8 +188,14 @@ void addBorderToFrame(Frame* frame) {
   new_grid[0][3] = tmp;
   new_grid[frame->rows - 1][3] = tmp;
 
-  for (int i=1; i<frame->rows-1; i++) {
-    sprintf(new_grid[i], "%s %s %s", vert_line, frame->grid[i-1], vert_line);
+  // Fill the frames new vpad rows
+  for (int i=1; i<vpad+1; i++) {
+    sprintf(new_grid[i], "%s%*c%s", vert_line, outline_width - 2, ' ', vert_line);
+    sprintf(new_grid[frame->rows - i - 1], "%s%*c%s", vert_line, outline_width - 2, ' ', vert_line);
+  }
+
+  for (int i=0; i<orig_rows; i++) {
+    sprintf(new_grid[i+1+vpad], "%s %s %s", vert_line, frame->grid[i], vert_line);
   }
 
   frame->grid = new_grid;
@@ -241,6 +247,6 @@ Frame* make_word_bank(unsigned correct, unsigned incorrect) {
   sprintf(matrix[row] + col, "%*c", 25 % letters_per_row - 1, ' ');
 
   Frame* frame = frameFromMatrix(rows, cols, matrix);
-  addBorderToFrame(frame);
+  addBorderToFrame(frame, 0);
   return frame;
 }
