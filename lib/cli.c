@@ -14,13 +14,16 @@ void clear_screen()
   { system("clear"); }
 
 void printFrame(Frame* frame) {
+  for (int i=0; i<frame->rows; i++)
+    { printf("%s\n", frame->grid[i]); }
+  return;
+}
+
+void debugFrame(Frame* frame) {
   for (int i=0; i<frame->rows; i++) {
-    /*
     for(int c=0; c<frame->cols; c++) {
       printf("%c = %d\n", frame->grid[i][c], frame->grid[i][c]);
     }
-    */
-    printf("%s\n", frame->grid[i]);
   }
   return;
 }
@@ -132,6 +135,39 @@ Frame* frameFromMatrix(int rows, int cols, char matrix[rows][cols]) {
   return frame;
 }
 
+void addBorderToFrame(Frame* frame) {
+  const char vert_line[] = { '\xE2', '\x94', '\x82', '\0' };
+  const char horz_line[] = { '\xE2', '\x94', '\x80', '\0' };
+  const char top_lft[] = "\u250C";
+  const char top_rgt[] = "\u2510";
+  const char bot_lft[] = "\u2514";
+  const char bot_rgt[] = "\u256F";
+
+  // update frame props
+  int orig_rows = frame->rows;
+  int orig_cols = frame->cols;
+  frame->rows += 2;
+  frame->cols += 2;
+
+  // Setting some new mem
+  char** new_grid = malloc(frame->rows * sizeof(char*));
+  for (int i=0; i<frame->rows; i++)
+    { new_grid[i] = malloc(frame->cols * sizeof(char)); }
+
+  // Fill the frame
+  memset(new_grid[0], '-', frame->cols);
+  memset(new_grid[frame->rows - 1], '-', frame->cols);
+  for (int i=1; i<frame->rows-1; i++) {
+    new_grid[i][0] = '|';
+    new_grid[i][1] = ' ';
+    int written = sprintf(new_grid[i] + 2, "%s", frame->grid[i-1]);
+    new_grid[i][written + 2] = '|';
+  }
+
+  frame->grid = new_grid;
+  return;
+}
+
 /*
  * Function to load the word bank into a `frame` structure
  * There are at most 7 letters per line, surrounded by a frame
@@ -144,16 +180,14 @@ Frame* frameFromMatrix(int rows, int cols, char matrix[rows][cols]) {
 */
 Frame* make_word_bank(unsigned correct, unsigned incorrect) {
   /* Configurable vars */
-  const int rows = 6;
+  const int rows = 4;
   const int letters_per_row = 7;
   /* */
-  const char vert_line[] = { '\xE2', '\x94', '\x82', '\0' };
-  const char horz_line[] = { '\xE2', '\x94', '\x80', '\0' };
   const int cols = letters_per_row * 11 + 5; // 11 chars per letter (color codes), 4 chars for padding, 1 char for null
   char matrix[rows][cols];
   memset(matrix, '\0', sizeof(matrix));
 
-  // TODO -- Make a separate function called `outline frame` or something of that nature
+  /*
   // Draw the outline
   int outline_width = letters_per_row * 2 + 2;
   for (int i=0; i<outline_width*3-1; i+=3) {
@@ -169,16 +203,16 @@ Frame* make_word_bank(unsigned correct, unsigned incorrect) {
   sprintf(matrix[rows-1] + outline_width*3, "\u256F"); // bot rgt
   matrix[0][3] = tmp;
   matrix[rows-1][3] = tmp;
+  */
 
-  int row = 0;
-  int col = cols-5; // why? good question
+  int row = -1;
+  int col = 0; // why? good question
   for (char c = 'A'; c <= 'Z'; c++) {
 
     // End the line if letters per row met
     if (!((c - 'A') % letters_per_row)) {
-      sprintf(matrix[row] + col, "%s", vert_line);
       row++;
-      col = 4;
+      col = 0;
     }
 
     // Set the color, add the character, reset the color
@@ -192,8 +226,9 @@ Frame* make_word_bank(unsigned correct, unsigned incorrect) {
   } //for loop
 
   // Add remaining spaces
-  sprintf(matrix[row] + col, "%*s", 25 % letters_per_row + 3, vert_line); // Z - A = 25 //+3 because 3 char in vert_line?
+  sprintf(matrix[row] + col, "%*c", 25 % letters_per_row, ' ');
 
   Frame* frame = frameFromMatrix(rows, cols, matrix);
+  addBorderToFrame(frame);
   return frame;
 }
