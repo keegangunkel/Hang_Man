@@ -33,41 +33,69 @@ char upper(char c) {
   return c;
 }
 
-int main() {
+int is_alphabetic(char c) {
+  c = upper(c);
+  if (c >= 'A' && c <= 'Z') { return 1; }
   return 0;
 }
 
-void check()
-{
-    // first one is letters of truth in word second is wrong and third is correct
-    //char wordData[3][26]; //unused? -Cooper
+int str_contains(char* str, char c) {
+  c = upper(c);
+  int i = 0;
+  while (str[i] != '\0') {
+    if (upper(str[i]) == c) { return 1; }
+    i++;
+  }
+  return 0;
+}
 
-    Word word = getHangmanWord();
-    int wordLen = strlen(word.letters);
-    printf("DEBUG: %s (%d)\n", word.letters, wordLen);
+int main() {
+  // initialize variables
+  unsigned   correct = 0; // bitmap of right guesses
+  unsigned incorrect = 0; // bitmap of wrong guesses
+  unsigned   display = 0; // bitmap of which characters to show the user
 
-    char guess[26];
-    char wrongGuesses[26];
-    char correctGuesses[26];
-    // bools
-    int correct = 0;
-    int wordComplete = 0;
+  Frame* char_bank;
 
-    // will turn off or on on right answers
-    char boolWord[wordLen];
-    char constructWord[wordLen];
-    for (int i = 0; i < wordLen - 1; i++)
-    {
-        boolWord[i] = '0';
-        constructWord[i] = '1';
+  // Get a word
+  Word word = getHangmanWord();
+  printf("DEBUG: ");
+  printWord(word);
+
+  // Get their input
+  while (1) {
+    char_bank = make_char_bank(correct, incorrect);
+    printFrame(char_bank);
+    freeFrame(char_bank);
+    char user_input[26];
+    scanf("%s", user_input);
+
+    int i = 0;
+    while (user_input[i] != '\0') {
+      if (!is_alphabetic(user_input[i])) { i++; continue; }
+      char input = upper(user_input[i]);
+
+      if (str_contains(word.letters, input))
+        { correct = correct | (1 << (input - 'A')); }
+      else
+        { incorrect = incorrect | (1 << (input - 'A')); }
+
+      i++;
     }
 
-    //
+    break; // testing porpoises
+  }
+  char_bank = make_char_bank(correct, incorrect);
+  printFrame(char_bank);
+  freeFrame(char_bank);
+  freeWord(word);
 
-    // to be implemented
-    int correctCount = 0;
+  return 0;
+}
 
-    // change this later
+/*
+void check()
+{
     int lives = 3;
     int points = 0;
     float scoreMultiplyer = 1;
@@ -83,7 +111,7 @@ void check()
 
             int guessLen = strlen(guess);
             // loop going through your guess string
-            for (int guessinx = 0; guessinx < guessLen; guessinx++)
+            for (int guessinx = 0; guessinx < guessLen; guessinx++);
             {
                 // word loop compares each guess to all letters in the wordt
                 for (int wordinx = 0; wordinx < 32; wordinx++)
@@ -151,3 +179,4 @@ void check()
     return;
     //return boolWord, wrongGuesses, correctGuesses;
 }
+*/
