@@ -49,6 +49,39 @@ int str_contains(char* str, char c) {
   return 0;
 }
 
+int bit_set(unsigned bm, int pos) {
+  unsigned mask = 1 << pos;
+  return (bm & mask) != 0;
+}
+
+unsigned set_bit(unsigned bm, int pos) {
+  unsigned mask = 1 << pos;
+  return bm | mask;
+}
+
+unsigned letter_positions(char* str, char c) {
+  c = upper(c);
+  int i = 0;
+  unsigned result = 0;
+  while (str[i] != '\0') {
+    if (upper(str[i]) == c)
+    { result = set_bit(result, i); }
+    i++;
+  }
+  return result;
+}
+
+void print_mapped_chars(char* str, unsigned bm) {
+  int i = 0;
+  while (str[i] != '\0') {
+    if (bit_set(bm, i)) { printf("%c", str[i]); }
+    else { printf("_"); }
+    i++;
+  }
+  printf("\n");
+  return;
+}
+
 int main() {
   // initialize variables
   unsigned   correct = 0; // bitmap of right guesses
@@ -66,6 +99,7 @@ int main() {
   while (1) {
     char_bank = make_char_bank(correct, incorrect);
     printFrame(char_bank);
+    print_mapped_chars(word.letters, display);
     freeFrame(char_bank);
     char user_input[26];
     scanf("%s", user_input);
@@ -75,8 +109,10 @@ int main() {
       if (!is_alphabetic(user_input[i])) { i++; continue; }
       char input = upper(user_input[i]);
 
-      if (str_contains(word.letters, input))
-        { correct = correct | (1 << (input - 'A')); }
+      if (str_contains(word.letters, input)) {
+        correct = correct | (1 << (input - 'A'));
+        display = display | letter_positions(word.letters, input);
+      }
       else
         { incorrect = incorrect | (1 << (input - 'A')); }
 
@@ -85,10 +121,6 @@ int main() {
 
     break; // testing porpoises
   }
-  char_bank = make_char_bank(correct, incorrect);
-  printFrame(char_bank);
-  freeFrame(char_bank);
-  freeWord(word);
 
   return 0;
 }
