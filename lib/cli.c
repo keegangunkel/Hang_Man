@@ -178,7 +178,7 @@ void addBorderToFrame(Frame* frame, int vpad, int hpad) {
  * https://stackoverflow.com/questions/523724/c-c-check-if-one-bit-is-set-in-i-e-int-variable
  * https://stackoverflow.com/questions/2674312/how-to-append-strings-using-sprintf
 */
-Frame* make_word_bank(unsigned correct, unsigned incorrect) {
+Frame* make_char_bank(unsigned correct, unsigned incorrect) {
   /* Configurable vars */
   const int rows = 4;
   const int letters_per_row = 7;

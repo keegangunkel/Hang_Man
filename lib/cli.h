@@ -15,6 +15,6 @@ void freeFrame(Frame* frame);
 
 Frame* frameFromFile(const char* path);
 Frame* frameFromMatrix(int r, int c, char m[r][c]);
-Frame* make_word_bank(unsigned c, unsigned i);
+Frame* make_char_bank(unsigned c, unsigned i);
 
 void addBorderToFrame(Frame* frame, int vpad, int hpad);
