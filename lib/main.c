@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 #include "words.h"
-#include "score.h"
 #include "sound.h"
 #include "cli.h"
 
@@ -28,14 +27,17 @@ void word_example() {
   freeWord(w);
 }
 
+char upper(char c) {
+  if (c >= 'a' && c <= 'z')
+    { c = c - 32; }
+  return c;
+}
+
 int main() {
-  word_example();
-  cli_example();
-  audio_example();
   return 0;
 }
 
-void /*const char* */check()
+void check()
 {
     // first one is letters of truth in word second is wrong and third is correct
     //char wordData[3][26]; //unused? -Cooper
@@ -135,7 +137,7 @@ void /*const char* */check()
 
             printf("words are %s    %s \n", constructWord, boolWord);
             boolWord[strlen(boolWord)-1] = '\0';
-            if (atoi(constructWord) == atoi(boolWord))
+            if (strcmp(constructWord, boolWord) == -49)
             {
                 printf("You completed word (%d pts)\n", points);
                 lives = 0;
