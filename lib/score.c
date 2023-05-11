@@ -2,7 +2,9 @@
 #include "words.h"
 #include <string.h>
 
-void /*const char* */check()
+
+/*
+check()
 {
     // first one is letters of truth in word second is wrong and third is correct
     //char wordData[3][26]; //unused? -Cooper
@@ -116,3 +118,4 @@ void /*const char* */check()
     return;
     //return boolWord, wrongGuesses, correctGuesses;
 }
+*/
