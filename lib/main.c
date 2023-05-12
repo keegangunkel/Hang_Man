@@ -1,8 +1,10 @@
 #include <stdio.h>
+#include <stdbool.h>
 #include <string.h>
 #include "words.h"
 #include "sound.h"
 #include "cli.h"
+#include "util.h"
 
 void audio_example() {
   AudioData audio = initAudio();
@@ -25,50 +27,6 @@ void word_example() {
   Word w = getHangmanWord();
   printWord(w);
   freeWord(w);
-}
-
-char upper(char c) {
-  if (c >= 'a' && c <= 'z')
-    { c = c - 32; }
-  return c;
-}
-
-int is_alphabetic(char c) {
-  c = upper(c);
-  if (c >= 'A' && c <= 'Z') { return 1; }
-  return 0;
-}
-
-int str_contains(char* str, char c) {
-  c = upper(c);
-  int i = 0;
-  while (str[i] != '\0') {
-    if (upper(str[i]) == c) { return 1; }
-    i++;
-  }
-  return 0;
-}
-
-int bit_set(unsigned bm, int pos) {
-  unsigned mask = 1 << pos;
-  return (bm & mask) != 0;
-}
-
-unsigned set_bit(unsigned bm, int pos) {
-  unsigned mask = 1 << pos;
-  return bm | mask;
-}
-
-unsigned letter_positions(char* str, char c) {
-  c = upper(c);
-  int i = 0;
-  unsigned result = 0;
-  while (str[i] != '\0') {
-    if (upper(str[i]) == c)
-    { result = set_bit(result, i); }
-    i++;
-  }
-  return result;
 }
 
 void print_mapped_chars(char* str, unsigned bm) {
