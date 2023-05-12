@@ -40,6 +40,9 @@ void print_mapped_chars(char* str, unsigned bm) {
   return;
 }
 
+int calculate_guess_count(Word w)
+  { return (26 - uniq_char_count(w.letters)) * 0.3; }
+
 int main() {
   // initialize variables
   unsigned   correct = 0; // bitmap of right guesses
@@ -49,8 +52,14 @@ int main() {
   Frame* char_bank;
 
   // Get a word
+  printf("Searching for a word...\n");
   Word word = getHangmanWord();
-  printf("DEBUG: ");
+  int guess_limit = calculate_guess_count(word);
+  printf("Solve the puzzle before the snowman melts! Each incorrect guess causes him to melt! After %d attempts he will be gone for the summer!\n", guess_limit);
+
+  // debug
+  printf("DEBUG: (%d guesses) -> ", guess_limit);
+  printf("has %d unique letters", uniq_char_count(word.letters));
   printWord(word);
 
   // Get their input

@@ -1,4 +1,5 @@
 #include "util.h"
+#include <stdio.h>
 
 
 /* String / Char functions */
@@ -14,8 +15,8 @@ bool is_alphabetic(char c) {
   return false;
 }
 
-
-bool str_contains(char* str, char c) {
+/* Not case sensitive */
+bool str_contains(const char* str, char c) {
   c = upper(c);
   int i = 0;
   while (str[i] != '\0') {
@@ -23,6 +24,21 @@ bool str_contains(char* str, char c) {
     i++;
   }
   return false;
+}
+
+int uniq_char_count(const char* str) {
+  bool alpha[26] = { false };
+  int result = 0;
+  int i = 0;
+  while (str[i] != '\0') {
+    int pos = upper(str[i]) - 'A';
+    if (alpha[pos]) { i++; continue; }
+
+    alpha[pos] = true;
+    result++;
+    i++;
+  }
+  return result;
 }
 
 /* Bitwise functions */
@@ -41,7 +57,7 @@ unsigned set_bit(unsigned bm, int pos) {
  * Function to find what positions a char is in a string
  * @return bitmap
 */
-unsigned letter_positions(char* str, char c) {
+unsigned letter_positions(const char* str, char c) {
   c = upper(c);
   int i = 0;
   unsigned result = 0;
