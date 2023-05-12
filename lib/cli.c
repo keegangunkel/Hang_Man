@@ -42,6 +42,11 @@ void freeFrame(Frame* frame) {
   return;
 }
 
+void printAndFreeFrame(Frame* frame) {
+  printFrame(frame);
+  freeFrame(frame);
+}
+
 /* return must be free'd with freeFrame */
 Frame* frameFromFile(const char* path) {
   Frame* frame = calloc(sizeof(Frame), 0);

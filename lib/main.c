@@ -14,19 +14,9 @@ void audio_example() {
 }
 
 void cli_example() {
-  //clear_screen();
   Frame* snowman = frameFromFile("assets/snowman1.txt");
-  Frame* char_bank = make_char_bank(4,8); //67108862
   printFrame(snowman);
-  printFrame(char_bank);
   freeFrame(snowman);
-  freeFrame(char_bank);
-}
-
-void word_example() {
-  Word w = getHangmanWord();
-  printWord(w);
-  freeWord(w);
 }
 
 void print_mapped_chars(char* str, unsigned bm) {
@@ -48,9 +38,7 @@ int main() {
   unsigned   correct = 0; // bitmap of right guesses
   unsigned incorrect = 0; // bitmap of wrong guesses
   unsigned   display = 0; // bitmap of which characters to show the user
-
-  int user_attempts = 0;
-  Frame* char_bank;
+  int user_attempts  = 0;
 
   // Get a word
   printf("Searching for a word...\n");
@@ -58,17 +46,15 @@ int main() {
   int guess_limit = calculate_guess_count(word);
   printf("Solve the puzzle before the snowman melts!\nEach incorrect guess causes him to melt!\nAfter %d wront attempts he will be gone for the summer!\n", guess_limit);
 
-  // debug
+  // debug stuff
   printf("DEBUG: (%d guesses) -> ", guess_limit);
   printf("has %d unique letters", uniq_char_count(word.letters));
   printWord(word);
 
   // Get their input
   while (user_attempts < guess_limit && !high_bitmap(display, strlen(word.letters))) {
-    char_bank = make_char_bank(correct, incorrect);
-    printFrame(char_bank);
+    printAndFreeFrame(make_char_bank(correct, incorrect));
     print_mapped_chars(word.letters, display);
-    freeFrame(char_bank);
     char user_input[26];
     scanf("%s", user_input);
 
@@ -79,13 +65,13 @@ int main() {
       unsigned input_bit = 1 << (input - 'A');
 
       if (str_contains(word.letters, input)) {
-        correct = correct | input_bit;
-        display = display | letter_positions(word.letters, input);
+        correct |= input_bit;
+        display |= letter_positions(word.letters, input);
       }
       else {
         // Make sure they don't get docked extra points
         if (!(incorrect & input_bit)) {
-          incorrect = incorrect | (1 << (input - 'A'));
+          incorrect |= (1 << (input - 'A'));
           user_attempts++;
         }
       }
