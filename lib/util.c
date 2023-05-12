@@ -53,6 +53,16 @@ unsigned set_bit(unsigned bm, int pos) {
   return bm | mask;
 }
 
+/* Is every bit turned on? */
+bool high_bitmap(unsigned bm, int bits) {
+  if (bm == 0) { return false; }
+  for (int i=0; i<bits; i++) {
+    if (!(bm & 1)) { return false; }
+    bm >>= 1;
+  }
+  return true;
+}
+
 /*
  * Function to find what positions a char is in a string
  * @return bitmap

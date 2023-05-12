@@ -49,6 +49,7 @@ int main() {
   unsigned incorrect = 0; // bitmap of wrong guesses
   unsigned   display = 0; // bitmap of which characters to show the user
 
+  int user_attempts = 0;
   Frame* char_bank;
 
   // Get a word
@@ -63,7 +64,7 @@ int main() {
   printWord(word);
 
   // Get their input
-  while (1) {
+  while (user_attempts < guess_limit && !high_bitmap(display, strlen(word.letters))) {
     char_bank = make_char_bank(correct, incorrect);
     printFrame(char_bank);
     print_mapped_chars(word.letters, display);
@@ -86,9 +87,10 @@ int main() {
       i++;
     }
 
-    break; // testing porpoises
+    //break; // testing porpoises
   }
 
+  printf("Game Over\n");
   return 0;
 }
 
