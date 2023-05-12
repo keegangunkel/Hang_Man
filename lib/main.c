@@ -56,7 +56,7 @@ int main() {
   printf("Searching for a word...\n");
   Word word = getHangmanWord();
   int guess_limit = calculate_guess_count(word);
-  printf("Solve the puzzle before the snowman melts! Each incorrect guess causes him to melt! After %d attempts he will be gone for the summer!\n", guess_limit);
+  printf("Solve the puzzle before the snowman melts!\nEach incorrect guess causes him to melt!\nAfter %d wront attempts he will be gone for the summer!\n", guess_limit);
 
   // debug
   printf("DEBUG: (%d guesses) -> ", guess_limit);
@@ -76,18 +76,24 @@ int main() {
     while (user_input[i] != '\0') {
       if (!is_alphabetic(user_input[i])) { i++; continue; }
       char input = upper(user_input[i]);
+      unsigned input_bit = 1 << (input - 'A');
 
       if (str_contains(word.letters, input)) {
-        correct = correct | (1 << (input - 'A'));
+        correct = correct | input_bit;
         display = display | letter_positions(word.letters, input);
       }
-      else
-        { incorrect = incorrect | (1 << (input - 'A')); }
+      else {
+        // Make sure they don't get docked extra points
+        if (!(incorrect & input_bit)) {
+          incorrect = incorrect | (1 << (input - 'A'));
+          user_attempts++;
+        }
+      }
 
       i++;
     }
 
-    //break; // testing porpoises
+    clear_screen();
   }
 
   printf("Game Over\n");
