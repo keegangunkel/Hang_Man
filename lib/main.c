@@ -1,15 +1,175 @@
 #include <stdio.h>
+#include <stdbool.h>
+#include <string.h>
 #include "words.h"
-#include "score.h"
 #include "sound.h"
+#include "cli.h"
+#include "util.h"
 
-int main() {
+void audio_example() {
   AudioData audio = initAudio();
   playBackgroundMusic(audio);
-  // gets a word, gets user input, checks, loops
-  // One giant function
-  // That's a lot of stuff. We will want to break this up - Cooper
-  check();
   cleanupAudio(audio);
+  return;
+}
+
+void cli_example() {
+  Frame* snowman = frameFromFile("assets/snowman1.txt");
+  printFrame(snowman);
+  freeFrame(snowman);
+}
+
+void print_mapped_chars(char* str, unsigned bm) {
+  int i = 0;
+  while (str[i] != '\0') {
+    if (bit_set(bm, i)) { printf("%c", str[i]); }
+    else { printf("_"); }
+    i++;
+  }
+  printf("\n");
+  return;
+}
+
+int calculate_guess_count(Word w)
+  { return (26 - uniq_char_count(w.letters)) * 0.3; }
+
+int main() {
+  // initialize variables
+  unsigned   correct = 0; // bitmap of right guesses
+  unsigned incorrect = 0; // bitmap of wrong guesses
+  unsigned   display = 0; // bitmap of which characters to show the user
+  int user_attempts  = 0;
+
+  // Get a word
+  printf("Searching for a word...\n");
+  Word word = getHangmanWord();
+  int guess_limit = calculate_guess_count(word);
+  printf("Solve the puzzle before the snowman melts!\nEach incorrect guess causes him to melt!\nAfter %d wront attempts he will be gone for the summer!\n", guess_limit);
+
+  // debug stuff
+  printf("DEBUG: (%d guesses) -> ", guess_limit);
+  printf("has %d unique letters", uniq_char_count(word.letters));
+  printWord(word);
+
+  // Get their input
+  while (user_attempts < guess_limit && !high_bitmap(display, strlen(word.letters))) {
+    printAndFreeFrame(make_char_bank(correct, incorrect));
+    print_mapped_chars(word.letters, display);
+    char user_input[26];
+    scanf("%s", user_input);
+
+    int i = 0;
+    while (user_input[i] != '\0') {
+      if (!is_alphabetic(user_input[i])) { i++; continue; }
+      char input = upper(user_input[i]);
+      unsigned input_bit = 1 << (input - 'A');
+
+      if (str_contains(word.letters, input)) {
+        correct |= input_bit;
+        display |= letter_positions(word.letters, input);
+      }
+      else {
+        // Make sure they don't get docked extra points
+        if (!(incorrect & input_bit)) {
+          incorrect |= (1 << (input - 'A'));
+          user_attempts++;
+        }
+      }
+
+      i++;
+    }
+
+    clear_screen();
+  }
+
+  printf("Game Over\n");
   return 0;
 }
+
+/*
+void check()
+{
+    int lives = 3;
+    int points = 0;
+    float scoreMultiplyer = 1;
+    int bonus = 1;
+
+    if (!wordComplete)
+    {
+        // lives loop keep playing until either you win or run out of lives
+        while (lives)
+        {
+            printf("Enter word: ");
+            scanf("%26s", guess);
+
+            int guessLen = strlen(guess);
+            // loop going through your guess string
+            for (int guessinx = 0; guessinx < guessLen; guessinx++);
+            {
+                // word loop compares each guess to all letters in the wordt
+                for (int wordinx = 0; wordinx < 32; wordinx++)
+                {
+                    // checks if right
+                    // printf(" test %i,    %i \n", guess[guessinx], word.letters[wordinx]);
+                    if (guess[guessinx] == word.letters[wordinx])
+                    {
+                        correct = 1;
+                        boolWord[wordinx] = '1';
+
+                        correctGuesses[guessinx] = guess[guessinx];
+                        printf("Your smart %d    %s\n", correctCount, boolWord);
+                        // printf("Your smart %d    %s\n", correctCount, boolWord);
+                    }
+                }
+                if (correct == 1)
+                {
+                    int duplicateGuess = strchr(correctGuesses, guess[guessinx]) != NULL;
+                    if (duplicateGuess == 0)
+                    {
+                        boolWord[guessinx] = '1';
+                        correctGuesses[guessinx] = guess[guessinx];
+                        points = bonus * scoreMultiplyer;
+                        // correctCount = correctCount + 1;
+                        //  implment score later
+
+                        // printf("Your smart %d    %s\n", correctCount, boolWord);
+                    }
+                }
+                else
+                {
+                    // checks for redudancy of guesses
+                    int duplicateGuess = strchr(wrongGuesses, guess[guessinx]) != NULL;
+                    if (duplicateGuess == 0)
+                    {
+                        printf("You guessed wrong\n");
+                        wrongGuesses[guessinx] = guess[guessinx];
+                        lives = lives - 1;
+                        printf(" %d attempts remain \n", lives);
+                    }
+                }
+
+                correct = 0;
+            }
+
+            if (!lives)
+            {
+                printf("Game Over\n");
+            }
+
+            printf("words are %s    %s \n", constructWord, boolWord);
+            boolWord[strlen(boolWord)-1] = '\0';
+            if (strcmp(constructWord, boolWord) == -49)
+            {
+                printf("You completed word (%d pts)\n", points);
+                lives = 0;
+            }
+        }
+    }
+
+    printf("_________________________\n");
+    freeWord(word);
+
+    return;
+    //return boolWord, wrongGuesses, correctGuesses;
+}
+*/
