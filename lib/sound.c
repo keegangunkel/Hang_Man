@@ -4,53 +4,26 @@
 
 /* Library functions found here https://wiki.libsdl.org/SDL2/CategoryAPI */
 
-AudioData initAudio() {
-    SDL_Init(SDL_INIT_AUDIO);
-
-    AudioData audio;
-
-    // Load background music into memory
-    SDL_LoadWAV("sounds/background_music.wav", &audio.wavSpec, &audio.bgmBuffer, &audio.bgmLength);
-    audio.bgmDeviceId = SDL_OpenAudioDevice(NULL, 0, &audio.wavSpec, NULL, 0);
-
-    // Load sound effects for guessing right and wrong into memory
-    SDL_LoadWAV("sounds/correct_sound.wav", &audio.wavSpec, &audio.rightBuffer, &audio.rightLength);
-    audio.rightDeviceId = SDL_OpenAudioDevice(NULL, 0, &audio.wavSpec, NULL, 0);
-
-    SDL_LoadWAV("sounds/wrong_sound.wav", &audio.wavSpec, &audio.wrongBuffer, &audio.wrongLength);
-    audio.wrongDeviceId = SDL_OpenAudioDevice(NULL, 0, &audio.wavSpec, NULL, 0);
-
-    return audio;
+AudioData loadAudioData(const char* path) {
+  AudioData audio = { 0 };
+  SDL_AudioSpec* I_dont_know_what_this_returns = SDL_LoadWAV(path, &audio.wavSpec, &audio.buffer, &audio.length);
+  if (!I_dont_know_what_this_returns) {
+    fprintf(stderr, "Failed to load the audio file: %s\n", path);
+    exit(1);
+  }
+  audio.id = SDL_OpenAudioDevice(NULL, 0, &audio.wavSpec, NULL, 0);
+  return audio;
 }
 
+/*
 void playBackgroundMusic(AudioData audio) {
     // Queue and unpause the background music
     SDL_QueueAudio(audio.bgmDeviceId, audio.bgmBuffer, audio.bgmLength);
     SDL_PauseAudioDevice(audio.bgmDeviceId, 0);
-}
-
-void playCorrectSound(AudioData audio) {
-    // Play sound effect for guessing right
-    SDL_QueueAudio(audio.rightDeviceId, audio.rightBuffer, audio.rightLength);
-    SDL_PauseAudioDevice(audio.rightDeviceId, 0);
-}
-
-void playWrongSound(AudioData audio) {
-    // Play sound effect for guessing wrong
-    SDL_QueueAudio(audio.wrongDeviceId, audio.wrongBuffer, audio.wrongLength);
-    SDL_PauseAudioDevice(audio.wrongDeviceId, 0);
-}
+} */
 
 void cleanupAudio(AudioData audio) {
-    // Clean up audio devices and free sound data
-    SDL_CloseAudioDevice(audio.bgmDeviceId);
-    SDL_FreeWAV(audio.bgmBuffer);
-
-    SDL_CloseAudioDevice(audio.rightDeviceId);
-    SDL_FreeWAV(audio.rightBuffer);
-
-    SDL_CloseAudioDevice(audio.wrongDeviceId);
-    SDL_FreeWAV(audio.wrongBuffer);
-
-    SDL_Quit();
+  SDL_CloseAudioDevice(audio.id);
+  SDL_FreeWAV(audio.buffer);
+  // SDL_Quit();
 }
