@@ -30,9 +30,9 @@ int main() {
   AudioData audio = initAudio();
   playBackgroundMusic(audio);
   // initialize variables
-  unsigned   correct = 0; // bitmap of right guesses
-  unsigned incorrect = 0; // bitmap of wrong guesses
-  unsigned   display = 0; // bitmap of which characters to show the user
+  unsigned   correct = 0; // alphabet bitmap of right guesses
+  unsigned incorrect = 0; // alphabet bitmap of wrong guesses
+  unsigned   display = 0; // word.letters bitmap of which characters to show the user
   int user_attempts  = 0;
 
   // Get a word
