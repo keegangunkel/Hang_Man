@@ -6,13 +6,6 @@
 #include "cli.h"
 #include "util.h"
 
-void audio_example() {
-  AudioData audio = initAudio();
-  playBackgroundMusic(audio);
-  cleanupAudio(audio);
-  return;
-}
-
 void cli_example() {
   Frame* snowman = frameFromFile("assets/snowman1.txt");
   printFrame(snowman);
@@ -34,6 +27,8 @@ int calculate_guess_count(Word w)
   { return (26 - uniq_char_count(w.letters)) * 0.3; }
 
 int main() {
+  AudioData audio = initAudio();
+  playBackgroundMusic(audio);
   // initialize variables
   unsigned   correct = 0; // bitmap of right guesses
   unsigned incorrect = 0; // bitmap of wrong guesses
@@ -67,12 +62,14 @@ int main() {
       if (str_contains(word.letters, input)) {
         correct |= input_bit;
         display |= letter_positions(word.letters, input);
+        playCorrectSound(audio);
       }
       else {
         // Make sure they don't get docked extra points
         if (!(incorrect & input_bit)) {
           incorrect |= (1 << (input - 'A'));
           user_attempts++;
+          playWrongSound(audio);
         }
       }
 
@@ -82,6 +79,7 @@ int main() {
     clear_screen();
   }
 
+  cleanupAudio(audio);
   printf("Game Over\n");
   return 0;
 }
