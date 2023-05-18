@@ -5,8 +5,8 @@
 #include "sound.h"
 #include "cli.h"
 #include "util.h"
+#include "common.h"
 
-#define DEBUG 0
 #define SNOWMEN 8 // the number of snowman assets (starting at 1)
 
 void show_snowman(int guesses, int total) {

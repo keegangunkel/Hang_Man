@@ -4,6 +4,7 @@
 #include <time.h>
 
 #include "http.h"
+#include "common.h"
 
 /* Copied from https://curl.se/libcurl/c/CURLOPT_WRITEFUNCTION.html */
 size_t http_callback(char* ptr, size_t size, size_t nmemb, void* userdata) {
@@ -88,6 +89,7 @@ void freeRequest(RequestData* req) {
 }
 
 void httpMultiGet(RequestData** requests, int count) {
+  if (DEBUG) { printf("Starting a multiget: "); }
   CURLM* multi = curl_multi_init();
   for (int i=0; i<count; i++) {
     curl_multi_add_handle(multi, requests[i]->curl);
@@ -97,7 +99,10 @@ void httpMultiGet(RequestData** requests, int count) {
   while (running) {
     // TODO: Check if this returned successfully
     /* CURLMcode code = */ curl_multi_perform(multi, &running);
+    if (DEBUG) {printf("."); fflush(stdout); }
   }
+
+  if (DEBUG) { printf("\n"); }
   curl_multi_cleanup(multi);
   return;
 }
