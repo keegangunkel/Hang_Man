@@ -28,6 +28,8 @@ int calculate_guess_count(Word w)
 
 int main() {
   AudioData bkgnd = loadAudio(BACKGROUND_MUSIC);
+  AudioData correct_effect = loadAudio(CORRECT_SOUND);
+  AudioData incorrect_effect = loadAudio(WRONG_SOUND);
   playAudio(bkgnd);
   // initialize variables
   unsigned   correct = 0; // alphabet bitmap of right guesses
@@ -62,14 +64,14 @@ int main() {
       if (str_contains(word.letters, input)) {
         correct |= input_bit;
         display |= letter_positions(word.letters, input);
-        //playCorrectSound(audio);
+        playAudio(correct_effect);
       }
       else {
         // Make sure they don't get docked extra points
         if (!(incorrect & input_bit)) {
           incorrect |= (1 << (input - 'A'));
           user_attempts++;
-          //playWrongSound(audio);
+          playAudio(incorrect_effect);
         }
       }
 

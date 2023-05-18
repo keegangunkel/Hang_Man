@@ -31,7 +31,7 @@ AudioData loadAudio(AudioEffect sound) {
     fprintf(stderr, "Failed to load the audio file: %s\n", path);
     exit(1);
   }
-  audio.id = SDL_OpenAudioDevice(NULL, 0, &audio.wavSpec, NULL, 0); // apparently the last 0 is for latency?
+  audio.id = SDL_OpenAudioDevice(NULL, 0, &audio.wavSpec, NULL, 0);
   return audio;
 }
 
