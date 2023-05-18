@@ -4,8 +4,14 @@
 
 /* Library functions found here https://wiki.libsdl.org/SDL2/CategoryAPI */
 
+static int AUDIO_INIT = 0;
+
 AudioData loadAudio(AudioEffect sound) {
-  SDL_Init(SDL_INIT_AUDIO);
+  if (!AUDIO_INIT) {
+    // I should do this in the http.c --Cooper
+    SDL_Init(SDL_INIT_AUDIO);
+    AUDIO_INIT = 1;
+  }
   AudioData audio = { 0 };
   const char* path;
   switch (sound) {
