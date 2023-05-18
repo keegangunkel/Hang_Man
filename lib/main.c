@@ -64,10 +64,11 @@ int main() {
 
     int i = 0; // index the user input
     while (user_input[i] != '\0' && playing) {
-      if (!is_alphabetic(user_input[i])) { i++; continue; }
+      if (!is_alphabetic(user_input[i])) { i++; continue; } // skip if non alphabetic
       char input = upper(user_input[i]);
       unsigned input_bit = 1 << (input - 'A');
 
+      // Check if that letter is correct
       if (str_contains(word.letters, input)) {
         correct |= input_bit;
         display |= letter_positions(word.letters, input);
@@ -87,6 +88,7 @@ int main() {
     }
 
     clear_screen();
+    printf("%d remaining attempts\n", guess_limit - user_attempts);
   } //outer while loop
 
   // Let then know if they won
