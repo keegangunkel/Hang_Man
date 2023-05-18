@@ -52,7 +52,7 @@ int main() {
   // While the game is going...
   bool playing = true;
   while (playing) {
-    // Display the snowman here?
+    // Print the game state
     show_snowman(user_attempts, guess_limit);
     printAndFreeFrame(make_char_bank(correct, incorrect));
     print_mapped_chars(word.letters, display, " ", "_");
