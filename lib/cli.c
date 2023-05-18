@@ -4,6 +4,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <wchar.h>
+#include "common.h"
 
 /* colors */
 #define GRN  "\033[32m"
@@ -15,11 +16,24 @@ int getVisibleLength(const char* str);
 char* read_file(const char* path);
 
 
-
-void clear_screen()
-  { system("clear"); }
+void clear_screen() {
+  if (DEBUG) {
+    printf("\n---- CLEAR ----\n\n");
+  }
+  else { system("clear"); }
+  return;
+}
 
 void printFrame(Frame* frame) {
+  if (DEBUG) {
+    for (int i=0; i<frame->rows; i++) {
+      for (int c=0; c<frame->cols; c++) {
+        printf("(%c: %d)", frame->grid[i][c], frame->grid[i][c]);
+      }
+      printf("\n");
+    }
+  } //if debug
+
   for (int i=0; i<frame->rows; i++)
     { printf("%s\n", frame->grid[i]); }
   return;
