@@ -29,6 +29,7 @@ int calculate_guess_count(Word w)
   { return (26 - uniq_char_count(w.letters)) * 0.3; }
 
 int main() {
+  clear_screen();
   // Load the audio files
   AudioData bkgnd = loadAudio(BACKGROUND_MUSIC);
   AudioData correct_effect = loadAudio(CORRECT_SOUND);
@@ -41,7 +42,6 @@ int main() {
   unsigned   display = 0; // word.letters bitmap of which characters to show the user
   int user_attempts  = 0;
 
-  // Get a word
   printf("Searching for a word...\n");
   Word word = getHangmanWord();
   int guess_limit = calculate_guess_count(word);
@@ -53,15 +53,17 @@ int main() {
     printWord(word);
   }
 
-  // Get their input
-  while (user_attempts < guess_limit && !high_bitmap(display, strlen(word.letters))) {
+  // While the game is going...
+  bool playing = true;
+  while (playing) {
+    // Display the snowman here?
     printAndFreeFrame(make_char_bank(correct, incorrect));
     print_mapped_chars(word.letters, display);
     char user_input[26];
     scanf("%s", user_input);
 
-    int i = 0;
-    while (user_input[i] != '\0') {
+    int i = 0; // index the user input
+    while (user_input[i] != '\0' && playing) {
       if (!is_alphabetic(user_input[i])) { i++; continue; }
       char input = upper(user_input[i]);
       unsigned input_bit = 1 << (input - 'A');
@@ -81,12 +83,22 @@ int main() {
       }
 
       i++;
+      playing = user_attempts < guess_limit && !high_bitmap(display, strlen(word.letters));
     }
 
     clear_screen();
-  }
+  } //outer while loop
 
+  // Let then know if they won
+  if (user_attempts < guess_limit) { printf("You guessed the word !  "); }
+  else                             { printf("The snowman has melted! "); }
+  printWord(word);
+
+  // cleanup
+  freeWord(word);
   cleanupAudio(bkgnd);
+  cleanupAudio(correct_effect);
+  cleanupAudio(incorrect_effect);
   printf("Game Over\n");
   return 0;
 }
