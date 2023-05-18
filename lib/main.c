@@ -6,7 +6,7 @@
 #include "cli.h"
 #include "util.h"
 
-#define DEBUG 1
+#define DEBUG 0
 #define SNOWMEN 8 // the number of snowman assets (starting at 1)
 
 void show_snowman(int guesses, int total) {
