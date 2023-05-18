@@ -9,17 +9,6 @@
 #define DEBUG 1
 #define SNOWMEN 8 // the number of snowman assets (starting at 1)
 
-void print_mapped_chars(char* str, unsigned bm) {
-  int i = 0;
-  while (str[i] != '\0') {
-    if (bit_set(bm, i)) { printf("%c", str[i]); }
-    else { printf("_"); }
-    i++;
-  }
-  printf("\n");
-  return;
-}
-
 void show_snowman(int guesses, int total) {
   int percentage = (double)guesses / total * 100;
   int snowman_ndx = (percentage / 100.0) * (SNOWMEN-1) + 1;
@@ -66,7 +55,7 @@ int main() {
     // Display the snowman here?
     show_snowman(user_attempts, guess_limit);
     printAndFreeFrame(make_char_bank(correct, incorrect));
-    print_mapped_chars(word.letters, display);
+    print_mapped_chars(word.letters, display, " ", "_");
     char user_input[26];
     scanf("%s", user_input);
 

@@ -79,4 +79,21 @@ unsigned letter_positions(const char* str, char c) {
   return result;
 }
 
-
+/*
+ * Print that characters in a string that are HIGH
+ * @param str - the string to print
+ * @param bm - the bitmap that is of length str
+ * @param sep - a string to separate each character
+ * @param low - a string to put inplace of a low character
+*/
+void print_mapped_chars(char* str, unsigned bm, char* sep, char* low) {
+  int i = 0;
+  while (str[i] != '\0') {
+    if (bit_set(bm, i)) { printf("%c", str[i]); }
+    else { printf("%s", low); }
+    printf("%s", sep);
+    i++;
+  }
+  printf("\n");
+  return;
+}
