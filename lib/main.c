@@ -6,6 +6,8 @@
 #include "cli.h"
 #include "util.h"
 
+#define DEBUG 1
+
 void cli_example() {
   Frame* snowman = frameFromFile("assets/snowman1.txt");
   printFrame(snowman);
@@ -27,11 +29,13 @@ int calculate_guess_count(Word w)
   { return (26 - uniq_char_count(w.letters)) * 0.3; }
 
 int main() {
+  // Load the audio files
   AudioData bkgnd = loadAudio(BACKGROUND_MUSIC);
   AudioData correct_effect = loadAudio(CORRECT_SOUND);
   AudioData incorrect_effect = loadAudio(WRONG_SOUND);
   playAudio(bkgnd);
-  // initialize variables
+
+  // initialize the game state
   unsigned   correct = 0; // alphabet bitmap of right guesses
   unsigned incorrect = 0; // alphabet bitmap of wrong guesses
   unsigned   display = 0; // word.letters bitmap of which characters to show the user
@@ -44,9 +48,10 @@ int main() {
   printf("Solve the puzzle before the snowman melts!\nEach incorrect guess causes him to melt!\nAfter %d wront attempts he will be gone for the summer!\n", guess_limit);
 
   // debug stuff
-  printf("DEBUG: (%d guesses) -> ", guess_limit);
-  printf("has %d unique letters", uniq_char_count(word.letters));
-  printWord(word);
+  if (DEBUG) {
+    printf("DEBUG: has %d unique letters", uniq_char_count(word.letters));
+    printWord(word);
+  }
 
   // Get their input
   while (user_attempts < guess_limit && !high_bitmap(display, strlen(word.letters))) {
