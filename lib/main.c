@@ -7,12 +7,7 @@
 #include "util.h"
 
 #define DEBUG 1
-
-void cli_example() {
-  Frame* snowman = frameFromFile("assets/snowman1.txt");
-  printFrame(snowman);
-  freeFrame(snowman);
-}
+#define SNOWMEN 8 // the number of snowman assets (starting at 1)
 
 void print_mapped_chars(char* str, unsigned bm) {
   int i = 0;
@@ -22,6 +17,18 @@ void print_mapped_chars(char* str, unsigned bm) {
     i++;
   }
   printf("\n");
+  return;
+}
+
+void show_snowman(int guesses, int total) {
+  int percentage = (double)guesses / total * 100;
+  int snowman_ndx = (percentage / 100.0) * (SNOWMEN-1) + 1;
+  if (DEBUG) { printf("Snowman %d guesses / %d total = %d percent == snowman %d\n", guesses, total, percentage, snowman_ndx); }
+
+  char path[20];
+  sprintf(path, "assets/snowman%d.txt", snowman_ndx);
+  Frame* snowman = frameFromFile(path);
+  printAndFreeFrame(snowman);
   return;
 }
 
@@ -57,6 +64,7 @@ int main() {
   bool playing = true;
   while (playing) {
     // Display the snowman here?
+    show_snowman(user_attempts, guess_limit);
     printAndFreeFrame(make_char_bank(correct, incorrect));
     print_mapped_chars(word.letters, display);
     char user_input[26];
@@ -92,6 +100,7 @@ int main() {
   } //outer while loop
 
   // Let then know if they won
+  show_snowman(user_attempts, guess_limit);
   if (user_attempts < guess_limit) { printf("You guessed the word !  "); }
   else                             { printf("The snowman has melted! "); }
   printWord(word);
