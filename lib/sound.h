@@ -14,8 +14,6 @@ typedef struct {
   SDL_AudioSpec wavSpec;
 } AudioData;
 
-AudioData initAudio();
-void playBackgroundMusic(AudioData audio);
-void playCorrectSound(AudioData audio);
-void playWrongSound(AudioData audio);
-void cleanupAudio(AudioData audio);
+AudioData loadAudio(AudioEffect a);
+void playAudio(AudioData a);
+void cleanupAudio(AudioData a);

@@ -27,8 +27,8 @@ int calculate_guess_count(Word w)
   { return (26 - uniq_char_count(w.letters)) * 0.3; }
 
 int main() {
-  AudioData audio = initAudio();
-  playBackgroundMusic(audio);
+  AudioData bkgnd = loadAudio(BACKGROUND_MUSIC);
+  playAudio(bkgnd);
   // initialize variables
   unsigned   correct = 0; // alphabet bitmap of right guesses
   unsigned incorrect = 0; // alphabet bitmap of wrong guesses
@@ -62,14 +62,14 @@ int main() {
       if (str_contains(word.letters, input)) {
         correct |= input_bit;
         display |= letter_positions(word.letters, input);
-        playCorrectSound(audio);
+        //playCorrectSound(audio);
       }
       else {
         // Make sure they don't get docked extra points
         if (!(incorrect & input_bit)) {
           incorrect |= (1 << (input - 'A'));
           user_attempts++;
-          playWrongSound(audio);
+          //playWrongSound(audio);
         }
       }
 
@@ -79,7 +79,7 @@ int main() {
     clear_screen();
   }
 
-  cleanupAudio(audio);
+  cleanupAudio(bkgnd);
   printf("Game Over\n");
   return 0;
 }

@@ -5,6 +5,7 @@
 /* Library functions found here https://wiki.libsdl.org/SDL2/CategoryAPI */
 
 AudioData loadAudio(AudioEffect sound) {
+  SDL_Init(SDL_INIT_AUDIO);
   AudioData audio = { 0 };
   const char* path;
   switch (sound) {
@@ -31,10 +32,11 @@ AudioData loadAudio(AudioEffect sound) {
 void playAudio(AudioData audio) {
   SDL_QueueAudio(audio.id, audio.buffer, audio.length);
   SDL_PauseAudioDevice(audio.id, 0);
+  return;
 }
 
 void cleanupAudio(AudioData audio) {
   SDL_CloseAudioDevice(audio.id);
   SDL_FreeWAV(audio.buffer);
-  // SDL_Quit();
+  SDL_Quit();
 }
